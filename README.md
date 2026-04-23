@@ -2,6 +2,8 @@
 
 Sistema de agentes especializados para o desenvolvimento de aplicações, orquestrado pelo **DevKit Orquestrador**. Os agentes cobrem todas as camadas do ciclo de desenvolvimento: arquitetura, banco de dados, backend, frontend, infraestrutura e documentação.
 
+> **Origem:** Este projeto é derivado de [edgesearchlabs/agentes-development](https://github.com/edgesearchlabs/agentes-development). Como o repositório original é privado, não foi possível realizar um fork formal — este repositório é uma adaptação independente com remoção de identidade visual proprietária e adição de configurabilidade genérica.
+
 ---
 
 ## Índice
