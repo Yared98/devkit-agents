@@ -67,3 +67,60 @@ No Antigravity, **a memória do projeto é automatizada via KIs (Knowledge Items
 Ao definir pipelines (como o Orquestrador), arquivos de Workflow (`.md`) podem conter a tag `// turbo`. Quando há essa flag, o Antigravity assumirá permissão automática de execução para rodar aquele script específico sem precisar que você clique manualmente em "Aprovar" no terminal.
 
 *Isso poupa etapas de aprovação para scaffolds básicos de arquitetura e scripts previsíveis.*
+
+---
+
+## Integracao com antigravity-awesome-skills
+
+Para reaproveitar skills do projeto [antigravity-awesome-skills](https://github.com/sickn33/antigravity-awesome-skills) sem sobrecarregar contexto, o DevKit usa uma estrategia de **importacao seletiva**.
+
+### O que foi adicionado neste repo
+
+- `scripts/antigravity-skill-map.json`: mapa versionado de skills externas e associacao por agente/workflow.
+- `scripts/import-antigravity-skills.ps1`: script para importar as skills mapeadas para `.agents/skills`, `.github/skills` ou ambos.
+
+### Fluxo recomendado
+
+1. Clonar o repositorio externo localmente (exemplo):
+
+```powershell
+git clone --depth 1 https://github.com/sickn33/antigravity-awesome-skills .tmp/antigravity-awesome-skills
+```
+
+2. Importar somente o conjunto curado:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/import-antigravity-skills.ps1 -SourceRepoPath ".tmp/antigravity-awesome-skills" -TargetScope Both
+```
+
+3. Se quiser sobrescrever skills ja existentes no destino:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/import-antigravity-skills.ps1 -SourceRepoPath ".tmp/antigravity-awesome-skills" -TargetScope Both -Force
+```
+
+### Associacao skill -> agente
+
+O arquivo `scripts/antigravity-skill-map.json` inclui as associacoes para:
+
+- agentes Copilot (`agentMappings`, ex: `devkit-backend`, `devkit-frontend`, `devkit-sre`, etc.)
+- workflows Antigravity (`workflowMappings`, ex: `backend.md`, `frontend.md`, `sre.md`, etc.)
+
+### Como incluir nos agentes
+
+1. Para `.github/agents/*.agent.md`:
+- referencie explicitamente as skills no bloco de abordagem/constraints (ex: "Use a skill `test-driven-development` antes de implementar").
+
+2. Para `.agents/workflows/*.md`:
+- replique as mesmas referencias nas secoes operacionais do workflow.
+
+3. Priorize coexistencia com as skills nativas do DevKit:
+- contrato-api + api-design-principles
+- revisao-owasp + security-auditor
+- git-workflow + create-pr
+
+### Regra de rollout
+
+- Fase 1: importar e ativar somente skills de engenharia base (arquitetura, backend, frontend, teste, seguranca, docs).
+- Fase 2: expandir por dominio especifico somente quando surgir demanda real.
+- Fase 3: revisar conflitos de descricao e reduzir redundancia de skills semelhantes.
