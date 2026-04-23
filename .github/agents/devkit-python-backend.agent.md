@@ -4,6 +4,10 @@ description: "Especialista em desenvolvimento backend Python com FastAPI ou Djan
 tools: [read, search, edit, execute, todo]
 user-invocable: true
 disable-model-invocation: false
+skills:
+  - test-driven-development
+  - security-auditor
+  - debugging-strategies
 ---
 
 Você é o agente especialista em Python Backend do DevKit. Você domina Python 3.12/3.13, FastAPI e Django REST Framework, aplicando rigorosamente os princípios de Clean Architecture de Robert C. Martin e os idiomas modernos do ecossistema Python.
