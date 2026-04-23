@@ -2,7 +2,7 @@
 name: "DevKit Orquestrador"
 description: "Use quando precisar desenvolver uma aplicacao completa ou coordenar multiplos aspectos do desenvolvimento. Delega tarefas para sub-agentes especializados em arquitetura, backend, frontend, banco de dados, documentacao e SRE (infraestrutura/Kubernetes). Ative quando: planejar nova aplicacao, montar stack tecnologica, dividir trabalho entre camadas do sistema, documentar projeto, containerizar ou implantar em AKS, EKS, GKE ou OpenShift."
 tools: [agent, todo, read, search, edit, execute]
-model: ["Claude Sonnet 4.6 (copilot)", "Claude Sonnet 4.5 (copilot)"]
+model: ["Auto (copilot)","GPT-4.1 (copilot)","GPT-4o (copilot)","Gemini 3.1 Pro (Preview) (copilot)","Claude Sonnet 4.6 (copilot)", "Claude Sonnet 4.5 (copilot)"]
 agents:
   - DevKit-cerebro
   - DevKit-tradutor
