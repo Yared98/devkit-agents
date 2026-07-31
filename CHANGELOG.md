@@ -5,6 +5,20 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/) c
 
 ---
 
+## [v1.9.1] — 2026-07-31
+
+### Adicionado
+
+- **`CURSOR.md` expandido**: documento canônico para Cursor no padrão de `CLAUDE.md` e `ANTIGRAVITY.md`, com protocolo para LLM, instalação por projeto/global, mapeamento de agentes, hooks, skills e scripts de manutenção.
+
+### Alterado
+
+- **`.cursor/COMO-USAR.md`**: reduzido a guia rápido humano, referenciando `CURSOR.md` para detalhes.
+- **`CURSOR-GLOBAL.md`**: consolidado em `CURSOR.md` (redirect).
+- **`README.md`**: referências atualizadas para `CURSOR.md` como documentação principal Cursor.
+
+---
+
 ## [v1.9.0] — 2026-07-31
 
 ### Adicionado

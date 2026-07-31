@@ -43,7 +43,7 @@ No chat do Cursor, use `@-mention` da rule do agente ou selecione um **Custom Mo
 @devkit-frontend criar tela de listagem com filtros e paginação
 ```
 
-Consulte [.cursor/COMO-USAR.md](.cursor/COMO-USAR.md) para todos os modos de invocação.
+Consulte [CURSOR.md](CURSOR.md) para protocolo completo, instalação e guia para o LLM. Guia rápido: [.cursor/COMO-USAR.md](.cursor/COMO-USAR.md).
 
 ### Claude Code / Antigravity
 
@@ -96,7 +96,7 @@ O Cursor lê automaticamente `AGENTS.md` na raiz do projeto e oferece três form
 
 Os lifecycle hooks (`PRE_TASK`, `POST_IMPLEMENT`, `POST_VALIDATE`, `POST_SESSION`) são executados **pelo próprio Agent** lendo os arquivos em `.github/hooks/`. Sub-agentes são spawned via **Task tool** conforme descrito em `CURSOR.md`.
 
-> Consulte [CURSOR.md](CURSOR.md) e [.cursor/COMO-USAR.md](.cursor/COMO-USAR.md) para instruções completas.
+> Consulte [CURSOR.md](CURSOR.md) para protocolo completo, instalação e instruções para o LLM. Guia rápido: [.cursor/COMO-USAR.md](.cursor/COMO-USAR.md).
 
 ---
 

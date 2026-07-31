@@ -2,7 +2,7 @@
 
 Este projeto usa o **DevKit**, sistema multi-agente para desenvolvimento completo.
 
-Leia `CURSOR.md` para o protocolo completo (hooks, sub-agentes, context bank).
+Leia **`CURSOR.md`** para protocolo completo, instalação (por projeto e global) e instruções detalhadas para o LLM.
 
 ## Ativar um agente
 
