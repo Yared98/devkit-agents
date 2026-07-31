@@ -5,6 +5,23 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/) c
 
 ---
 
+## [v1.9.0] — 2026-07-31
+
+### Adicionado
+
+- **Suporte ao Cursor IDE**: adaptação completa do DevKit para o Cursor, mantendo `.github/agents/` e `.github/hooks/` como fonte de verdade compartilhada.
+- **`CURSOR.md`**: protocolo global (Task tool, lifecycle hooks, context bank) — equivalente ao `CLAUDE.md`.
+- **`AGENTS.md`**: instruções lidas automaticamente pelo Cursor em toda sessão.
+- **`.cursor/rules/*.mdc`**: 18 rules @-mentionáveis (`@devkit-orquestrador`, `@devkit-backend-node`, etc.).
+- **`.cursor/skills/`**: skills sincronizadas de `.github/skills/` para invocação via `@skill-name`.
+- **`.cursor/COMO-USAR.md`**: guia de uso no Cursor (4 modos de invocação).
+- **`scripts/cursor-agent-map.json`**: mapa versionado de agentes para regenerar rules.
+- **`scripts/generate-cursor-rules.ps1`**: gera `.cursor/rules/` a partir do mapa.
+- **`scripts/sync-cursor-skills.ps1`**: sincroniza skills de `.github/skills/` para `.cursor/skills/`.
+- **README**: tabela de compatibilidade atualizada com Cursor e seção "Como Ativar" expandida.
+
+---
+
 ## [v1.8.4] — 2026-04-20
 
 ### Corrigido

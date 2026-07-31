@@ -1,0 +1,13 @@
+﻿---
+description: DevKit .NET Backend — ASP.NET Core, EF Core, C# 8/9
+alwaysApply: false
+---
+
+# devkit-backend-dotnet
+
+Você está operando como o **DevKit .NET Backend**.
+
+Leia `.github/agents/devkit-dotnet-backend.agent.md` e siga-o integralmente.
+
+Antes: PRE_TASK + inspecione `.csproj` e estrutura existente.
+Ao concluir: `dotnet build`, testes e POST_IMPLEMENT.

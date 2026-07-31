@@ -22,12 +22,32 @@ Sistema de agentes especializados para o desenvolvimento de aplicações, orques
 
 ## Como Ativar um Agente
 
-No GitHub Copilot Chat (VS Code), selecione o agente no seletor de modo antes de enviar sua mensagem:
+### GitHub Copilot (VS Code)
+
+No GitHub Copilot Chat, selecione o agente no seletor de modo antes de enviar sua mensagem:
 
 1. Abra o painel de chat do Copilot (`Ctrl+Shift+I` ou pelo ícone na barra lateral)
 2. Clique no seletor de modo (padrão: **Ask** ou **Edit**)
 3. Escolha o agente desejado na lista
 4. Digite sua solicitação normalmente
+
+### Cursor
+
+No chat do Cursor, use `@-mention` da rule do agente ou selecione um **Custom Mode**:
+
+```
+@devkit-orquestrador criar uma API REST de pedidos com Node.js e PostgreSQL
+```
+
+```
+@devkit-frontend criar tela de listagem com filtros e paginação
+```
+
+Consulte [.cursor/COMO-USAR.md](.cursor/COMO-USAR.md) para todos os modos de invocação.
+
+### Claude Code / Antigravity
+
+Use slash commands: `/orquestrador`, `/backend-dotnet`, `/frontend-blazor`, etc.
 
 > Todos os agentes entendem português. A tradução para inglês é feita automaticamente e de forma transparente pelo agente `DevKit Tradutor`.
 
@@ -35,13 +55,14 @@ No GitHub Copilot Chat (VS Code), selecione o agente no seletor de modo antes de
 
 ## Compatibilidade com Outros Ambientes
 
-O sistema DevKit foi originalmente construído para o **GitHub Copilot Chat** (VS Code), mas a contribuição da comunidade adicionou suporte completo ao **Claude Code** e ao **Antigravity**. Cada ambiente tem sua própria forma de invocar os agentes e uma pasta de configuração dedicada:
+O sistema DevKit foi originalmente construído para o **GitHub Copilot Chat** (VS Code), mas a contribuição da comunidade adicionou suporte completo ao **Claude Code**, **Antigravity** e **Cursor**. Cada ambiente tem sua própria forma de invocar os agentes e uma pasta de configuração dedicada:
 
 | Ambiente | Como invocar | Configuração | Documentação |
 |---|---|---|---|
 | **GitHub Copilot** (VS Code) | Seletor de modo no chat | `.github/agents/*.agent.md` | Este README |
 | **Claude Code** (CLI / IDE) | Slash commands (`/orquestrador`, `/backend`, etc.) | `.claude/commands/*.md` + `CLAUDE.md` | [CLAUDE.md](CLAUDE.md) · [.claude/COMO-USAR.md](.claude/COMO-USAR.md) |
 | **Antigravity** | Slash commands (`/orquestrador`, `/backend-dotnet`, etc.) | `.agents/workflows/*.md` | [ANTIGRAVITY.md](ANTIGRAVITY.md) |
+| **Cursor** | @-mention de rules (`@devkit-orquestrador`) ou Custom Modes | `.cursor/rules/*.mdc` + `AGENTS.md` | [CURSOR.md](CURSOR.md) · [.cursor/COMO-USAR.md](.cursor/COMO-USAR.md) |
 
 ### GitHub Copilot
 
@@ -64,6 +85,18 @@ O Antigravity lê nativamente a pasta `.agents/` e oferece três features exclus
 - **Turbo Automation** — workflows marcados com `// turbo` em `.agents/workflows/` recebem aprovação automática de execução para scripts previsíveis (scaffolds, migrations simples), eliminando cliques manuais de confirmação.
 
 > Consulte [ANTIGRAVITY.md](ANTIGRAVITY.md) para instruções completas.
+
+### Cursor
+
+O Cursor lê automaticamente `AGENTS.md` na raiz do projeto e oferece três formas de invocar os agentes:
+
+- **@-mention de rules** — digite `@devkit-orquestrador`, `@devkit-backend-node`, etc. no chat. Cada rule em `.cursor/rules/*.mdc` aponta para o `.agent.md` correspondente em `.github/agents/`.
+- **Custom Modes** — crie modes em **Settings → Chat → Custom Modes** colando o conteúdo do `.agent.md` desejado. Equivalente ao seletor de modo do Copilot.
+- **Skills** — skills em `.cursor/skills/` são invocáveis com `@scaffold-clean-arch`, `@revisao-owasp`, etc. Sincronize de `.github/skills/` com `scripts/sync-cursor-skills.ps1`.
+
+Os lifecycle hooks (`PRE_TASK`, `POST_IMPLEMENT`, `POST_VALIDATE`, `POST_SESSION`) são executados **pelo próprio Agent** lendo os arquivos em `.github/hooks/`. Sub-agentes são spawned via **Task tool** conforme descrito em `CURSOR.md`.
+
+> Consulte [CURSOR.md](CURSOR.md) e [.cursor/COMO-USAR.md](.cursor/COMO-USAR.md) para instruções completas.
 
 ---
 

@@ -1,0 +1,13 @@
+﻿---
+description: DevKit Backend — roteador para agentes de linguagem
+alwaysApply: false
+---
+
+# devkit-backend
+
+Você está operando como o **DevKit Backend** (roteador).
+
+Leia `.github/agents/devkit-backend.agent.md` e siga-o integralmente.
+
+Se a linguagem não foi definida, aplique `decisao-linguagem` antes de implementar.
+Consulte `.DevKit/context.md` — não reabra decisões registradas.

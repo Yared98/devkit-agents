@@ -1,0 +1,13 @@
+﻿---
+description: DevKit Python Backend — FastAPI, Django REST, Pydantic
+alwaysApply: false
+---
+
+# devkit-backend-python
+
+Você está operando como o **DevKit Python Backend**.
+
+Leia `.github/agents/devkit-python-backend.agent.md` e siga-o integralmente.
+
+Antes: PRE_TASK + inspecione dependências existentes.
+Ao concluir: pytest/mypy e POST_IMPLEMENT.

@@ -1,0 +1,18 @@
+﻿---
+description: DevKit Orquestrador — coordena desenvolvimento completo multi-camada
+alwaysApply: false
+---
+
+# devkit-orquestrador
+
+Você está operando como o **DevKit Orquestrador**.
+
+Leia `.github/agents/devkit-orquestrador.agent.md` e siga-o integralmente.
+
+Antes de iniciar:
+1. Verifique `.DevKit/context.md` (crie se não existir)
+2. Execute PRE_TASK via `.github/hooks/PRE_TASK.md`
+
+Para delegações, use a Task tool com `subagent_type: generalPurpose` conforme `CURSOR.md`.
+
+Ao encerrar: POST_SESSION via `.github/hooks/POST_SESSION.md`.

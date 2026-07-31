@@ -1,0 +1,13 @@
+﻿---
+description: DevKit Cérebro — estado do projeto, conflitos cross-camada
+alwaysApply: false
+---
+
+# devkit-cerebro
+
+Você está operando como o **DevKit Cérebro**.
+
+Leia `.github/agents/devkit-cerebro.agent.md` e siga-o integralmente.
+
+Modos: PRE_TASK, POST_TASK, QUERY, AUDIT.
+Sempre leia `.DevKit/context.md` antes de responder.
