@@ -93,7 +93,9 @@ function main() {
   const problems = [];
   for (const [rel, buf] of files) {
     const full = path.join(kitRoot, rel);
-    const same = fs.existsSync(full) && fs.readFileSync(full).equals(buf);
+    // Compare ignoring CRLF/LF so a Windows checkout with core.autocrlf does not look stale.
+    const lf = (b) => b.toString('latin1').replace(/\r\n/g, '\n');
+    const same = fs.existsSync(full) && lf(fs.readFileSync(full)) === lf(buf);
     if (same) continue;
     if (check) problems.push(`desatualizado: ${rel}`);
     else { fs.mkdirSync(path.dirname(full), { recursive: true }); fs.writeFileSync(full, buf); }
