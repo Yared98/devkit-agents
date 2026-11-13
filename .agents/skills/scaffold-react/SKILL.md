@@ -1,7 +1,6 @@
 ---
 name: scaffold-react
 description: "Configura o projeto React ou Next.js do zero com estrutura de pastas, dependências e convenções padrão do agente de frontend DevKit. Use quando: iniciar um novo projeto frontend, definir estrutura de componentes, configurar Tailwind, React Query, Zustand e roteamento."
-user-invocable: true
 ---
 
 # Scaffold React / Next.js

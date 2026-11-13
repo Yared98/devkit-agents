@@ -1,7 +1,6 @@
 ---
 name: ansible
 description: "Cria e revisa automação de infraestrutura com Ansible: playbooks, roles, inventory, handlers, vars e Ansible Vault. Use quando: provisionar servidores, configurar ambientes, automatizar deploys sem Kubernetes, gerenciar configuração de múltiplos hosts."
-user-invocable: true
 ---
 
 # Ansible — Automação de Infraestrutura

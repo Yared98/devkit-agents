@@ -1,7 +1,6 @@
 ---
 name: gerar-migration-postgres
 description: "Gera arquivos de migration PostgreSQL seguindo as boas práticas do agente de banco de dados DevKit: nomenclatura, UUID, TIMESTAMPTZ, constraints nomeadas, índices e triggers de updated_at. Use quando: criar uma nova tabela, alterar schema existente, adicionar índice ou constraint."
-user-invocable: true
 ---
 
 # Gerar Migration PostgreSQL

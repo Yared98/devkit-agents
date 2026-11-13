@@ -1,7 +1,6 @@
 ---
 name: terraform
 description: "Cria e revisa infraestrutura como código com Terraform: providers, recursos, módulos, state, workspaces e pipelines de plan/apply. Use quando: provisionar infra em Azure, AWS ou GCP de forma declarativa, criar módulos reutilizáveis, gerenciar state remoto."
-user-invocable: true
 ---
 
 # Terraform — Infraestrutura como Código

@@ -1,14 +1,13 @@
 ---
 name: scaffold-clean-arch
 description: "Gera a estrutura de pastas e arquivos base seguindo Clean Architecture (Robert C. Martin) adaptada à stack escolhida. Use quando: arquitetura foi definida e é hora de criar a estrutura física do projeto, qualquer linguagem (Node.js, Python, Java, Go)."
-user-invocable: true
 ---
 
 # Scaffold Clean Architecture
 
 ## Quando Usar
 
-- Logo após a decisão arquitetural do `DevKit-arquitetura`
+- Logo após a decisão arquitetural do skill `arquitetura`
 - Quando o usuário pedir para "criar a estrutura do projeto"
 - Antes de qualquer implementação de código de negócio
 

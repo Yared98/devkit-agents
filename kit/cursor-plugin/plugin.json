@@ -1,0 +1,8 @@
+{
+  "name": "devkit",
+  "description": "Skills, subagents e hooks para desenvolvimento full stack: orquestração por camadas, stacks de backend e frontend, SRE, validação e Context Bank.",
+  "version": "2.0.0",
+  "author": { "name": "Yared98" },
+  "repository": "https://github.com/Yared98/devkit-agents",
+  "keywords": ["full-stack", "skills", "subagents", "hooks", "pt-br"]
+}

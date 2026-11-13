@@ -1,7 +1,6 @@
 ---
 name: dockerfile-review
 description: "Revisa Dockerfiles existentes em busca de problemas de segurança, performance de build, tamanho de imagem e conformidade com boas práticas SRE. Use quando: receber um Dockerfile para avaliar, antes de publicar uma imagem em produção, ou ao auditar containerização de uma aplicação legada."
-user-invocable: true
 ---
 
 # Revisão de Dockerfile

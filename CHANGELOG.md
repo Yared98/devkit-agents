@@ -5,6 +5,38 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/) c
 
 ---
 
+## [v2.0.0] — 2026-11-13
+
+Reestruturação para skills, subagents e hooks nativos de Claude Code, Cursor e Antigravity, com fonte única.
+
+### Adicionado
+
+- **Fonte única de skills** em `.agents/skills/` (formato Agent Skills padrão), copiada para `.claude/skills/` por `scripts/sync.mjs`.
+- **Subagents reais** em `kit/agents/`, gerados para `.claude/agents/`, `.cursor/agents/` e `.agents/agents/`: `devkit-explorador`, `devkit-validador` e `devkit-documentador` em modelo barato; `devkit-implementador` e `devkit-revisor` em modelo intermediário. Modelos por ferramenta em `kit/models.json`.
+- **Hooks reais** (`.agents/hooks/devkit-hook.mjs`): injeção do Context Bank no início da sessão, confirmação para comandos destrutivos, registro de arquivos alterados e lembrete de validação e registro ao fim do turno.
+- **Skills novas:** `contexto` (substitui o agente Cérebro e as skills `project-context-bank` e `lifecycle-hooks`) e `identidade-visual` (une as quatro skills de marca).
+- **Plugin do Cursor**: `.cursor-plugin/marketplace.json` na raiz e o plugin `devkit` gerado em `plugins/devkit/` (skills, subagents e hooks), para instalar pelo Customize do Cursor sem copiar arquivos.
+- **Hook `subagentStop` no Cursor**: registra os arquivos alterados por subagents.
+- **`scripts/install.mjs`**: instala o kit em outro projeto, por ferramenta, sem sobrescrever arquivos existentes.
+
+### Alterado
+
+- Os 17 agentes de `.github/agents/` viraram skills com o mesmo conteúdo técnico: `orquestrador`, `arquitetura`, `banco-dados`, `backend`, `backend-*`, `frontend*`, `sre`, `sre-investigador`, `tester`, `docs`.
+- `decisao-linguagem` passou a ser referência interna da skill `backend`.
+- Context Bank em `.devkit/context.md` (minúsculas); configuração em `.devkit/config.md` e marca em `.devkit/brand.md`.
+- `AGENTS.md` é o arquivo de instruções canônico; `CLAUDE.md` apenas o importa.
+
+### Removido
+
+- **Camadas duplicadas:** `.github/agents/`, `.github/skills/`, `.github/hooks/`, `.agents/workflows/` (workflows estão obsoletos no Antigravity), `.claude/commands/`, `.cursor/rules/` e os scripts PowerShell de sincronização.
+- **Agente e skill de tradução** (`tradutor`, `traduzir-entrada`): os modelos atuais trabalham direto em português; a etapa só gastava tokens.
+- **Skills genéricas de comunidade** que repetem o comportamento padrão do modelo ou outra skill do kit: `brainstorming`, `ask-questions-if-underspecified`, `architect-review`, `code-review-checklist`, `security-auditor`, `docker-expert`, `deployment-pipeline-design`, `lint-and-validate`.
+- **Guias de linha de comando:** `awscli`, `azurecli`, `gcpsdk`, `ssh-connect`.
+- `k8s-troubleshoot` (coberta por `sre-investigador`).
+- Documentos por ferramenta (`CURSOR.md`, `CURSOR-GLOBAL.md`, `ANTIGRAVITY.md`, `SKILLS_INTEGRATION.md`, `COMO-USAR.md`), consolidados no README.
+
+---
+
 ## [v1.9.1] — 2026-07-31
 
 ### Adicionado

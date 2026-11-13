@@ -1,9 +1,6 @@
 ---
 name: frontend-design
-description: "You are a frontend designer-engineer, not a layout generator."
-risk: unknown
-source: community
-date_added: "2026-02-27"
+description: "Cria interfaces web com qualidade de produção e identidade própria, evitando o visual genérico de IA. Use quando: construir páginas, componentes, dashboards ou landing pages em que o acabamento visual importa."
 ---
 
 # Frontend Design (Distinctive, Production-Grade)

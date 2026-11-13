@@ -1,0 +1,4 @@
+{
+  "cheap": { "claude": "haiku", "cursor": "claude-haiku-5-5", "antigravity": "flash" },
+  "standard": { "claude": "sonnet", "cursor": "inherit", "antigravity": "pro" }
+}

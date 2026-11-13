@@ -1,2 +1,2 @@
-﻿# Gerado localmente por scripts/sync-cursor-skills.ps1
-.cursor/skills/
+﻿.devkit/.session.json
+node_modules/

@@ -1,7 +1,6 @@
 ---
 name: git-workflow
 description: "Define e executa o padrão de trabalho com Git no repositório DevKit: branches, Conventional Commits, merge strategy e tags semver. Use quando: finalizar uma feature, criar commits, realizar merge ou tagear uma release."
-user-invocable: true
 ---
 
 # Git Workflow DevKit
@@ -43,8 +42,8 @@ O escopo identifica **qual domínio** da stack foi afetado:
 
 | Escopo | O que cobre |
 |---|---|
-| `agent` | Criação ou alteração de um agente (`.github/agents/`) |
-| `skill` | Criação ou alteração de uma skill (`.github/skills/`) |
+| `agent` | Criação ou alteração de um agente (`kit/agents/`) |
+| `skill` | Criação ou alteração de uma skill (`.agents/skills/`) |
 | `sre` | Infraestrutura, Kubernetes, Docker, pipelines |
 | `backend` | Lógica de negócio, API, camada de serviço |
 | `frontend` | Interface, componentes React/Next.js |
@@ -108,7 +107,7 @@ fix(sre): corrigir selector do Service no template de manifest AKS
 docs: atualizar README com seção do agente SRE Investigador
 
 # Refactor sem mudança de comportamento
-refactor(skill): reorganizar seções da skill k8s-troubleshoot
+refactor(skill): reorganizar seções da skill sre-investigador
 
 # Breaking change
 feat(agent)!: remover campo argument-hint do orquestrador
@@ -164,10 +163,10 @@ Cada commit deve representar **uma unidade lógica completa**:
 
 ```bash
 # ✅ Commit atômico — uma mudança, um propósito
-git add .github/agents/DevKit-sre-investigador.agent.md
+git add .agents/skills/sre-investigador/
 git commit -m "feat(agent): adicionar agente DevKit SRE Investigador"
 
-git add .github/agents/DevKit-orquestrador.agent.md
+git add .agents/skills/orquestrador/
 git commit -m "feat(agent): registrar SRE Investigador no orquestrador"
 
 git add README.md

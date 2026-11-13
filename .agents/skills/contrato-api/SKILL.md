@@ -1,7 +1,6 @@
 ---
 name: contrato-api
 description: "Define e documenta os contratos de API REST entre camadas (frontend ↔ backend) e entre use cases e repositórios. Use quando: arquitetura foi definida e é preciso alinhar o que o backend expõe com o que o frontend consome, ou quando precisar formalizar as interfaces entre camadas internas."
-user-invocable: true
 ---
 
 # Definição de Contrato de API

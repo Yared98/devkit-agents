@@ -1,9 +1,6 @@
 ---
 name: debugging-strategies
-description: "Transform debugging from frustrating guesswork into systematic problem-solving with proven strategies, powerful tools, and methodical approaches."
-risk: safe
-source: community
-date_added: "2026-02-27"
+description: "Depuração sistemática: reproduzir, isolar, formular hipóteses, bissecção e análise de causa raiz. Use quando: investigar um bug, falha intermitente, regressão ou problema de performance sem causa evidente."
 ---
 
 # Debugging Strategies

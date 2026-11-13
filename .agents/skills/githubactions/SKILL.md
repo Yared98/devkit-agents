@@ -1,7 +1,6 @@
 ---
 name: githubactions
 description: "Cria e revisa pipelines CI/CD com GitHub Actions: workflow syntax, jobs, steps, secrets, environments, matrix builds e reusable workflows. Use quando: automatizar build, test e deploy de qualquer aplicação no GitHub, criar pipelines multi-cloud (Azure/AWS/GCP) ou padronizar fluxos de CI/CD."
-user-invocable: true
 ---
 
 # GitHub Actions — Pipelines CI/CD

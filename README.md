@@ -1,714 +1,131 @@
-# DevKit — Agentes de Desenvolvimento
+# DevKit — skills, subagents e hooks para desenvolvimento full stack
 
-Sistema de agentes especializados para o desenvolvimento de aplicações, orquestrado pelo **DevKit Orquestrador**. Os agentes cobrem todas as camadas do ciclo de desenvolvimento: arquitetura, banco de dados, backend, frontend, infraestrutura e documentação.
+Um conjunto único de skills, subagents e hooks que funciona em **Claude Code**, **Cursor** e **Antigravity**. O modelo principal planeja e integra; subagents em modelo barato exploram o projeto, rodam os testes e escrevem a documentação; hooks cuidam do que não deve depender de o modelo lembrar.
 
-> **Origem:** Este projeto é derivado de [edgesearchlabs/agentes-development](https://github.com/edgesearchlabs/agentes-development). Como o repositório original é privado, não foi possível realizar um fork formal — este repositório é uma adaptação independente com remoção de identidade visual proprietária e adição de configurabilidade genérica.
+> **Origem:** derivado de [edgesearchlabs/agentes-development](https://github.com/edgesearchlabs/agentes-development) (privado), adaptado de forma independente, sem a identidade visual proprietária.
 
----
+## Instalação em um projeto
 
-## Índice
+Requer Node.js 18 ou mais novo (usado pelos hooks e pelos scripts).
 
-- [Como ativar um agente](#como-ativar-um-agente)
-- [Compatibilidade com Outros Ambientes](#compatibilidade-com-outros-ambientes)
-- [Orquestrador](#orquestrador)
-- [Agentes Especializados](#agentes-especializados)
-- [Hierarquia de Agentes](#hierarquia-de-agentes)
-- [Hooks de Ciclo de Vida](#hooks-de-ciclo-de-vida)
-- [Skills Disponíveis](#skills-disponíveis)
-- [Assets de Marca](#assets-de-marca)
-- [Exemplos de Uso](#exemplos-de-uso)
-
----
-
-## Como Ativar um Agente
-
-### GitHub Copilot (VS Code)
-
-No GitHub Copilot Chat, selecione o agente no seletor de modo antes de enviar sua mensagem:
-
-1. Abra o painel de chat do Copilot (`Ctrl+Shift+I` ou pelo ícone na barra lateral)
-2. Clique no seletor de modo (padrão: **Ask** ou **Edit**)
-3. Escolha o agente desejado na lista
-4. Digite sua solicitação normalmente
-
-### Cursor
-
-No chat do Cursor, use `@-mention` da rule do agente ou selecione um **Custom Mode**:
-
-```
-@devkit-orquestrador criar uma API REST de pedidos com Node.js e PostgreSQL
-```
-
-```
-@devkit-frontend criar tela de listagem com filtros e paginação
-```
-
-Consulte [CURSOR.md](CURSOR.md) para protocolo completo, instalação e guia para o LLM. Guia rápido: [.cursor/COMO-USAR.md](.cursor/COMO-USAR.md).
-
-### Claude Code / Antigravity
-
-Use slash commands: `/orquestrador`, `/backend-dotnet`, `/frontend-blazor`, etc.
-
-> Todos os agentes entendem português. A tradução para inglês é feita automaticamente e de forma transparente pelo agente `DevKit Tradutor`.
-
----
-
-## Compatibilidade com Outros Ambientes
-
-O sistema DevKit foi originalmente construído para o **GitHub Copilot Chat** (VS Code), mas a contribuição da comunidade adicionou suporte completo ao **Claude Code**, **Antigravity** e **Cursor**. Cada ambiente tem sua própria forma de invocar os agentes e uma pasta de configuração dedicada:
-
-| Ambiente | Como invocar | Configuração | Documentação |
-|---|---|---|---|
-| **GitHub Copilot** (VS Code) | Seletor de modo no chat | `.github/agents/*.agent.md` | Este README |
-| **Claude Code** (CLI / IDE) | Slash commands (`/orquestrador`, `/backend`, etc.) | `.claude/commands/*.md` + `CLAUDE.md` | [CLAUDE.md](CLAUDE.md) · [.claude/COMO-USAR.md](.claude/COMO-USAR.md) |
-| **Antigravity** | Slash commands (`/orquestrador`, `/backend-dotnet`, etc.) | `.agents/workflows/*.md` | [ANTIGRAVITY.md](ANTIGRAVITY.md) |
-| **Cursor** | @-mention de rules (`@devkit-orquestrador`) ou Custom Modes | `.cursor/rules/*.mdc` + `AGENTS.md` | [CURSOR.md](CURSOR.md) · [.cursor/COMO-USAR.md](.cursor/COMO-USAR.md) |
-
-### GitHub Copilot
-
-Os agentes são registrados como modos customizados em `.github/agents/`. A identidade visual, stack e constraints de cada agente ficam nos arquivos `.agent.md` e são injetados automaticamente pelo Copilot Chat em cada sessão.
-
-### Claude Code
-
-O arquivo `CLAUDE.md` na raiz do repositório é lido automaticamente pelo Claude Code em toda sessão, fornecendo o protocolo de lifecycle hooks, a estrutura de context bank e o mapeamento de slash commands. Os comandos ficam em `.claude/commands/` e cada arquivo corresponde a um agente — por exemplo, `/orquestrador` carrega `.claude/commands/orquestrador.md`.
-
-Os lifecycle hooks (`PRE_TASK`, `POST_IMPLEMENT`, `POST_VALIDATE`, `POST_SESSION`) são executados **pelo próprio Claude** lendo os arquivos em `.github/hooks/`, sem necessidade de sub-agentes separados para isso.
-
-> Consulte [CLAUDE.md](CLAUDE.md) e [.claude/COMO-USAR.md](.claude/COMO-USAR.md) para instruções completas.
-
-### Antigravity
-
-O Antigravity lê nativamente a pasta `.agents/` e oferece três features exclusivas em relação aos outros ambientes:
-
-- **Skills automáticas** — as skills em `.agents/skills/` são carregadas por heurística conforme a intenção detectada no prompt, sem necessidade de invocação explícita (diferente do Copilot e Claude, onde o agente invoca a skill por nome).
-- **KIs (Knowledge Items)** — memória persistente cross-sessão gerada automaticamente ao final de cada task boundary. Na próxima sessão, o Antigravity recupera decisões arquiteturais, stack confirmada e contratos anteriores sem precisar reler o context bank manualmente.
-- **Turbo Automation** — workflows marcados com `// turbo` em `.agents/workflows/` recebem aprovação automática de execução para scripts previsíveis (scaffolds, migrations simples), eliminando cliques manuais de confirmação.
-
-> Consulte [ANTIGRAVITY.md](ANTIGRAVITY.md) para instruções completas.
-
-### Cursor
-
-O Cursor lê automaticamente `AGENTS.md` na raiz do projeto e oferece três formas de invocar os agentes:
-
-- **@-mention de rules** — digite `@devkit-orquestrador`, `@devkit-backend-node`, etc. no chat. Cada rule em `.cursor/rules/*.mdc` aponta para o `.agent.md` correspondente em `.github/agents/`.
-- **Custom Modes** — crie modes em **Settings → Chat → Custom Modes** colando o conteúdo do `.agent.md` desejado. Equivalente ao seletor de modo do Copilot.
-- **Skills** — skills em `.cursor/skills/` são invocáveis com `@scaffold-clean-arch`, `@revisao-owasp`, etc. Sincronize de `.github/skills/` com `scripts/sync-cursor-skills.ps1`.
-
-Os lifecycle hooks (`PRE_TASK`, `POST_IMPLEMENT`, `POST_VALIDATE`, `POST_SESSION`) são executados **pelo próprio Agent** lendo os arquivos em `.github/hooks/`. Sub-agentes são spawned via **Task tool** conforme descrito em `CURSOR.md`.
-
-> Consulte [CURSOR.md](CURSOR.md) para protocolo completo, instalação e instruções para o LLM. Guia rápido: [.cursor/COMO-USAR.md](.cursor/COMO-USAR.md).
-
----
-
-## Orquestrador
-
-**Agente: `DevKit Orquestrador`**
-
-O ponto de entrada para qualquer desenvolvimento completo. Recebe sua solicitação, planeja as etapas e delega para os sub-agentes especializados na ordem correta.
-
-### Quando usar
-
-- Desenvolver uma aplicação do zero (parcial ou completa)
-- Coordenar múltiplas camadas simultaneamente
-- Não sabe qual sub-agente acionar — use o orquestrador
-
-### Fluxo interno
-
-```
-Usuário
-  └─► DevKit Orquestrador
-        ├─► DevKit Tradutor        (tradução transparente — sempre primeiro)
-        ├─► DevKit Cérebro         (estado do projeto e lifecycle hooks)
-        │     ├─► PRE_TASK  → Context Brief antes de cada delegação
-        │     ├─► POST_VALIDATE → atualiza estado + detecta conflitos
-        │     └─► QUERY / AUDIT → consulta e auditoria cross-camada
-        ├─► DevKit Arquitetura     (decisões de stack e estrutura)
-        ├─► DevKit Banco de Dados  (modelagem e migrations)
-        ├─► DevKit Backend         (API e regras de negócio)
-        │     ├─► DevKit .NET Backend      (quando a stack for C#/.NET)
-        │     ├─► DevKit Node.js Backend   (quando a stack for TypeScript/Node.js)
-        │     ├─► DevKit Python Backend    (quando a stack for Python)
-        │     ├─► DevKit Go Backend        (quando a stack for Go)
-        │     ├─► DevKit Java Backend      (quando a stack for Java)
-        │     └─► DevKit Rust Backend      (quando a stack for Rust)
-        ├─► DevKit Frontend        (interface React/Next.js)
-        ├─► DevKit Tester          (validação após cada camada — POST_IMPLEMENT)
-        ├─► DevKit SRE             (Dockerfile, K8s, CI/CD)
-        │     └─► DevKit SRE Investigador  (diagnóstico de falhas em produção)
-        └─► DevKit Documentação    (README, ADR, guias)
-```
-
-### Exemplos de solicitação
-
-```
-Crie uma API REST de gerenciamento de pedidos com Node.js e PostgreSQL
-```
-
-```
-Preciso de uma aplicação completa com frontend React, backend Java Spring Boot, PostgreSQL e deploy no AKS
-```
-
-```
-Crie só o banco de dados para um sistema de usuários com perfis e permissões
-```
-
-### Delegação seletiva
-
-Quando o pedido envolver apenas uma camada, o orquestrador aciona somente os agentes necessários:
-
-| Pedido | Sub-agentes ativados |
-|---|---|
-| Criar o banco de dados | Banco de Dados |
-| Criar o backend | Arquitetura → Backend |
-| Criar backend em Rust | Arquitetura → Rust Backend |
-| Criar backend em Java | Arquitetura → Java Backend |
-| Criar backend em .NET | Arquitetura → .NET Backend |
-| Criar backend em Node.js / TypeScript | Arquitetura → Node.js Backend |
-| Criar backend em Python | Arquitetura → Python Backend |
-| Criar backend em Go | Arquitetura → Go Backend |
-| Criar API de alta performance | Arquitetura → Rust Backend (Rust sugerido) |
-| Criar o frontend | Arquitetura → Frontend |
-| Documentar o projeto | Documentação |
-| Criar Dockerfile ou imagem | SRE |
-| Deploy no AKS / EKS / GKE / OpenShift | SRE |
-| Investigar pod com erro / logs / manifests | SRE Investigador |
-| Pod em CrashLoopBackOff / 503 / OOMKilled | SRE Investigador |
-| Testar / validar se funciona | Tester |
-| Algo quebrou / erro ao rodar | Tester |
-| Aplicação completa com infra | Todos, na ordem do fluxo |
-| Aplicação completa sem infra | Todos exceto SRE |
-| Gerar mensagem de commit / merge / tag | skill `git-workflow` (via Orquestrador ou Documentação) |
-
----
-
-## Agentes Especializados
-
-Cada agente pode ser ativado diretamente quando você já sabe qual camada trabalhar.
-
----
-
-### DevKit Arquitetura
-
-**Especialidade:** Arquitetura de software seguindo Clean Architecture e Clean Code (Robert C. Martin).
-
-**Quando usar diretamente:**
-- Definir a estrutura de pastas e camadas de uma nova aplicação
-- Escolher entre frameworks e estilos arquiteturais
-- Registrar decisões arquiteturais (ADR)
-
-**Comportamento:** Conduz uma entrevista com 7 perguntas antes de propor qualquer coisa. Nunca pula para a implementação sem entender o contexto.
-
-**Skills que usa:** `scaffold-clean-arch`, `contrato-api`
-
-```
-Quero arquitetar uma API de notificações em tempo real com alta disponibilidade
-```
-
----
-
-### DevKit Backend
-
-**Especialidade:** APIs REST/GraphQL, regras de negócio, autenticação, integrações. Delega automaticamente para o agente especialista da linguagem identificada: `.NET`, `Node.js`, `Python`, `Go`, `Java` ou `Rust`.
-
-**Quando usar diretamente:**
-- Implementar endpoints e lógica de negócio em Node.js, Python, Go ou PHP
-- Configurar autenticação/autorização (JWT, OAuth2)
-- Integrar com serviços externos
-
-> Quando o usuário mencionar alta performance, baixo uso de memória ou containers leves sem especificar linguagem, o agente sugere Rust proativamente.
-
-**Skills que usa:** `contrato-api` (antes de codar), `revisao-owasp` (obrigatório ao fechar endpoints)
-
-```
-Implemente os endpoints de autenticação com JWT e refresh token em Node.js
-```
-
----
-
-### DevKit .NET Backend
-
-**Especialidade:** **.NET 8/9 (C#)** com ASP.NET Core, EF Core e Minimal APIs. Sub-agente do Backend.
-
-**Quando usar diretamente:**
-- APIs REST em C# com ASP.NET Core (Minimal API ou Controllers)
-- Migrar de versões antigas do .NET (Framework, Core 3.1, .NET 6/7)
-- Integração com PostgreSQL via EF Core + Npgsql
-
-**Skills que usa:** `contrato-api`, `revisao-owasp`, `scaffold-clean-arch`
-
-```
-Crie uma API REST de gerenciamento de usuários em .NET 8 com ASP.NET Core, EF Core e PostgreSQL
-```
-
----
-
-### DevKit Node.js Backend
-
-**Especialidade:** **Node.js 22 LTS + TypeScript 5.x** com Fastify (padrão) ou NestJS. Sub-agente do Backend.
-
-**Quando usar diretamente:**
-- APIs REST com Fastify + Zod + Prisma
-- Projetos NestJS enterprise com DI e decorators
-- Microserviços TypeScript com `strict: true` e sem `any`
-
-**Skills que usa:** `contrato-api`, `revisao-owasp`, `scaffold-clean-arch`
-
-```
-Implemente os endpoints de autenticação com JWT e refresh token usando Fastify e Prisma
-```
-
----
-
-### DevKit Python Backend
-
-**Especialidade:** **Python 3.12/3.13** com FastAPI (padrão) ou Django REST Framework. Sub-agente do Backend.
-
-**Quando usar diretamente:**
-- APIs REST em FastAPI com Pydantic v2 e SQLAlchemy 2.x async
-- Integração de modelos de ML/AI com API Python
-- Projetos Django com admin panel e DRF
-
-**Skills que usa:** `contrato-api`, `revisao-owasp`, `scaffold-clean-arch`
-
-```
-Implemente os endpoints de autenticação com JWT e refresh token usando FastAPI e SQLAlchemy
-```
-
----
-
-### DevKit Go Backend
-
-**Especialidade:** **Go 1.22+** com Gin (padrão), Fiber ou net/http nativo. Sub-agente do Backend.
-
-**Quando usar diretamente:**
-- Microserviços de alta performance com Go
-- Containers com footprint mínimo (imagem distroless)
-- APIs com pgx direto e golang-migrate
-
-**Skills que usa:** `contrato-api`, `revisao-owasp`, `scaffold-clean-arch`
-
-```
-Crie uma API REST de pedidos em Go com Gin, pgx e golang-migrate
-```
-
----
-
-### DevKit Java Backend
-
-**Especialidade:** Java 21, 23 e 25 com Spring Boot 3.x ou Quarkus. Sub-agente do Backend.
-
-**Quando usar diretamente:**
-- Projetos Java explicitamente (pode ser ativado direto ou via orquestrador)
-- Migrar de versões anteriores do Java
-- Otimizar código Java com Records, Virtual Threads e APIs modernas
-
-**Skills que usa:** `revisao-owasp`, `contrato-api`
-
-```
-Crie um serviço de pedidos com Spring Boot 3.x, JPA e validação de estoque
-```
-
----
-
-### DevKit Rust Backend
-
-**Especialidade:** Rust moderno (edição 2021/2024) com **Axum** (padrão) e Actix-web. Sub-agente do Backend.
-
-**Quando usar diretamente:**
-- Projetos Rust explicitamente (pode ser ativado direto ou via orquestrador)
-- APIs REST/gRPC de alta performance com baixo uso de memória
-- Microserviços cloud-native com containers extremamente leves
-- Servidores MCP (Model Context Protocol) em Rust
-
-> Rust é a linguagem mais admirada pelo mercado pelo 9º ano consecutivo (82% — SO Developer Survey 2024).
-
-**Skills que usa:** `scaffold-rust-api`, `revisao-owasp`, `contrato-api`
-
-```
-Crie uma API REST de autenticação com Axum + SQLx + PostgreSQL
-```
-
----
-
-### DevKit Banco de Dados
-
-**Especialidade:** PostgreSQL como banco relacional padrão. Modelagem, DDL, DQL e tuning.
-
-**Quando usar diretamente:**
-- Criar ou alterar schema de banco de dados
-- Escrever queries otimizadas
-- Criar índices, constraints e migrations
-
-**Convenções aplicadas:** UUID como PK, `TIMESTAMPTZ` em todos os campos de data, constraints nomeadas, trigger automático de `updated_at`, índices `CONCURRENTLY`.
-
-**Output obrigatório:** Ao finalizar qualquer tarefa de modelagem, o agente gera automaticamente um **diagrama ER em Mermaid** salvo em `docs/database/schema-diagram.md` com todas as entidades, relacionamentos e tipos de dados.
-
-**Skills que usa:** `gerar-migration-postgres`
-
-```
-Crie o schema de produtos, categorias e variantes com relacionamentos e índices para busca full-text
-```
-
----
-
-### DevKit Frontend
-
-**Especialidade:** React e Next.js com TypeScript, Tailwind CSS, React Query e Zustand.
-
-**Quando usar diretamente:**
-- Criar telas e componentes de UI
-- Integrar o frontend com a API backend
-- Configurar roteamento e estado global
-
-**Comportamento:** Consulta `.github/brand/guide.txt` antes de criar qualquer UI para garantir aderência à identidade visual. Consulta `docs/contracts/` antes de integrar com APIs. Exige output funcional e visível — não entrega componentes sem renderização validada.
-
-**Skills que usa:** `scaffold-react`, `contrato-api`, `tokens-design-react`, `branding-DevKit-react`, `selecao-assets-marca`, `qa-identidade-visual`
-
-```
-Crie a tela de listagem e detalhe de produtos com filtros, paginação e skeleton loading
-```
-
----
-
-### DevKit SRE
-
-**Especialidade:** Containerização e Kubernetes por cloud. Suporta AKS, EKS, GKE e OpenShift.
-
-**Quando usar diretamente:**
-- Criar ou revisar Dockerfiles
-- Gerar manifests Kubernetes (Deployment, Service, Ingress, HPA, etc.)
-- Configurar pipelines CI/CD
-- Diagnosticar problemas em pods e clusters
-
-**Comportamento:** Conduz entrevista de 7 perguntas para identificar cloud, runtime e requisitos antes de gerar qualquer arquivo.
-
-**Constraints:** Nunca usa `latest` como tag; nunca roda como root; sempre define `resources.limits`; sempre configura liveness e readiness probes.
-
-**Skills que usa:** `scaffold-k8s`, `dockerfile-review`, `pipeline-cicd`, `k8s-troubleshoot`
-
-```
-Crie o Dockerfile e os manifests Kubernetes para o deploy da API no AKS com HPA e Ingress
-```
-
-```
-O pod está em CrashLoopBackOff no namespace production, me ajude a diagnosticar
-```
-
----
-
-### DevKit SRE Investigador
-
-**Especialidade:** Diagnóstico e investigação de problemas em clusters Kubernetes com base em manifests reais e logs. Parte da família SRE.
-
-**Quando usar diretamente:**
-- Pod em estado de erro (`CrashLoopBackOff`, `OOMKilled`, `Pending`, `ImagePullBackOff`)
-- Ingress retornando 502, 503 ou 404 sem motivo aparente
-- Rolling update travado
-- Secrets/ConfigMaps não montando (`CreateContainerConfigError`)
-- HPA não escalando
-- Qualquer comportamento inesperado em produção
-
-**Como usar:** Forneça os artefatos relevantes — o agente pede o que estiver faltando:
 ```bash
-kubectl get deployment {nome} -n {ns} -o yaml
-kubectl get svc {nome} -n {ns} -o yaml
-kubectl get ingress {nome} -n {ns} -o yaml
-kubectl logs {pod} -n {ns} --previous
-kubectl describe pod {pod} -n {ns}
+git clone https://github.com/Yared98/devkit-agents
 ```
 
-**Comportamento:** Correlaciona automaticamente selectors entre Deployment → Service → Ingress; analisa exit codes nos logs; identifica mismatch de portas, labels, chaves de Secret e configurações de probe. Entrega sempre: causa raiz com evidência, correção exata e comando de validação.
-
-**Skills que usa:** `k8s-troubleshoot`
-
-```
-O pod está em CrashLoopBackOff com exit code 137. Segue o Deployment e os logs:
-[cole o YAML e os logs aqui]
+```bash
+node devkit-agents/scripts/install.mjs caminho/do/projeto
 ```
 
-```
-Ingress retorna 503 intermitente no namespace prod. Segue o Service e o Ingress:
-[cole os YAMLs aqui]
-```
+Para instalar só para algumas ferramentas, acrescente `--tools claude,cursor` (valores: `claude`, `cursor`, `antigravity`). O instalador nunca sobrescreve `AGENTS.md`, `CLAUDE.md`, `.devkit/*` nem arquivos de hooks que já existam, a menos que você passe `--force`.
 
----
+### Alternativa no Cursor: plugin
 
-### DevKit Cérebro
+O repositório também é um marketplace de plugins do Cursor (`.cursor-plugin/marketplace.json`), com o plugin `devkit` em `plugins/devkit/` (skills, subagents e hooks). Instale em Customize → Install a partir do repositório no GitHub, por projeto ou para o seu usuário, ou copie `plugins/devkit` para `~/.cursor/plugins/local/devkit` e recarregue a janela para testar localmente.
 
-**Especialidade:** Estado centralizado do projeto e lifecycle hooks. Age como pre-hook (lê contexto, sintetiza briefing) e post-hook (atualiza estado, detecta conflitos, recomenda próximos passos) em todo ciclo de delegação do orquestrador.
+Use o plugin **ou** o instalador no mesmo projeto, não os dois: com ambos, os hooks rodam em dobro e as skills podem aparecer duplicadas. O plugin não cria `AGENTS.md` nem `.devkit/`; crie o Context Bank pedindo a skill `contexto`.
 
-**Quando usar diretamente:**
-- Consultar o estado atual do projeto ("qual o status do backend?", "há conflitos entre camadas?")
-- Saber o próximo passo recomendado com base no que já foi feito
-- Auditar consistência entre camadas (tabelas existem no banco? endpoint referenciado no frontend existe no backend?)
+Depois, edite `.devkit/config.md` (stack e convenções) e `.devkit/brand.md` (identidade visual) e, na ferramenta, peça `/orquestrador <o que construir>`.
 
-**Modos de operação:**
-- `PRE_TASK` — lê context.md e gera um Context Brief estruturado para o sub-agente que vai receber a delegação
-- `POST_TASK` — atualiza o context.md com log de execução, estado por camada e conflitos detectados
-- `QUERY` — responde perguntas diretas sobre o estado do projeto
-- `AUDIT` — auditoria de consistência cross-camada
+## O que cada ferramenta lê
 
-**Constraints:** NÃO implementa código; NÃO delega para outros agentes; SEMPRE preserva o histórico do log.
+| Recurso | Claude Code | Cursor | Antigravity |
+|---|---|---|---|
+| Instruções | `CLAUDE.md` (importa `AGENTS.md`) | `AGENTS.md` | `AGENTS.md` |
+| Skills | `.claude/skills/` | `.agents/skills/` | `.agents/skills/` |
+| Subagents | `.claude/agents/` | `.cursor/agents/` | `.agents/agents/` (App e CLI) |
+| Hooks | `.claude/settings.json` | `.cursor/hooks.json` | `.agents/hooks.json` |
+| Modelo barato | `haiku` | ID definido em `kit/models.json` | `flash` |
+| Invocar skill | `/nome` ou automático | `/nome`, `@nome` ou automático | `/nome` ou automático |
 
-```
-Qual o estado atual do projeto? O que está pendente?
-```
+As skills são escritas uma vez em `.agents/skills/` (formato Agent Skills padrão). Os subagents são escritos uma vez em `kit/agents/` e o `scripts/sync.mjs` gera o frontmatter de cada ferramenta.
 
-```
-Há conflitos entre o banco de dados e o backend implementado?
-```
+## Skills
 
----
+**Fluxo e camadas**
 
-### DevKit Tester
-
-**Especialidade:** Validação funcional imediata após implementação. Executa testes automatizados, verifica compilação, health checks e realiza troubleshoot quando encontra erros.
-
-**Quando usar diretamente:**
-- Após qualquer agente concluir sua implementação
-- Quando algo não está funcionando e precisa de diagnóstico rápido
-- Antes de fazer commit de qualquer mudança
-
-**Comportamento:** Lê o context bank, identifica a stack em uso, executa os comandos de validação corretos para a linguagem, diagnostica erros com causa raiz e aplica correções pontuais. Retorna `PASS`, `FAIL_FIXABLE` ou `FAIL_BLOCKED` para o orquestrador.
-
-**Integração:** Chamado automaticamente pelo Orquestrador após cada sub-agente concluir e antes de cada commit.
-
-```
-O backend foi implementado, teste se está funcionando
-```
-
----
-
-### DevKit Documentação
-
-**Especialidade:** Documentação técnica de impacto — README, ADR, guias de contribuição, referência de API, changelogs.
-
-**Quando usar diretamente:**
-- Gerar ou atualizar README de um projeto
-- Documentar endpoints e contratos de API
-- Registrar decisões arquiteturais
-
-**Comportamento:** Lê o código real antes de escrever qualquer documentação. Não usa emojis decorativos — apenas símbolos funcionais (✅ ❌ ⚠️ 🔒 🚧).
-
-```
-Gere o README completo do projeto com setup, variáveis de ambiente e guia de contribuição
-```
-
----
-
-### DevKit Tradutor
-
-**Agente interno — não invocar diretamente.**
-
-Traduz o input do usuário para inglês usando `gpt-4o-mini` antes de qualquer processamento. A tradução é transparente: o usuário never vê o texto traduzido e sempre recebe a resposta no idioma original.
-
----
-
-## Hierarquia de Agentes
-
-```
-DevKit Orquestrador
-├── DevKit Tradutor                (interno, sempre primeiro)
-├── DevKit Cérebro                 (estado global do projeto e lifecycle hooks)
-├── DevKit Arquitetura
-├── DevKit Banco de Dados
-├── DevKit Backend
-│   ├── DevKit .NET Backend        (sub-agente — C#/.NET 8/9)
-│   ├── DevKit Node.js Backend     (sub-agente — TypeScript/Node.js 22)
-│   ├── DevKit Python Backend      (sub-agente — Python 3.12/3.13)
-│   ├── DevKit Go Backend          (sub-agente — Go 1.22+)
-│   ├── DevKit Java Backend        (sub-agente — Java 21/23/25)
-│   └── DevKit Rust Backend        (sub-agente — Rust 2021/2024)
-├── DevKit Frontend
-├── DevKit Tester              (validação após cada camada implementada)
-├── DevKit SRE
-│   └── DevKit SRE Investigador    (investigação de falhas em produção)
-└── DevKit Documentação
-```
-
----
-
-## Hooks de Ciclo de Vida
-
-Os hooks são artefatos físicos em `.github/hooks/` — instruções completas executadas pelos agentes em momentos específicos do ciclo de desenvolvimento. Os agentes leem o arquivo do hook correspondente antes de agir.
-
-| Arquivo | Executor | Quando é executado |
-|---|---|---|
-| [`PRE_TASK.md`](.github/hooks/PRE_TASK.md) | DevKit Cérebro | Antes de qualquer delegação para sub-agente — sintetiza Context Brief com estado do projeto |
-| [`POST_IMPLEMENT.md`](.github/hooks/POST_IMPLEMENT.md) | DevKit Tester | Após qualquer implementação — valida por stack e retorna `PASS`, `FAIL_FIXABLE` ou `FAIL_BLOCKED` |
-| [`POST_VALIDATE.md`](.github/hooks/POST_VALIDATE.md) | DevKit Cérebro | Após validação bem-sucedida — atualiza context.md e detecta conflitos entre camadas |
-| [`POST_SESSION.md`](.github/hooks/POST_SESSION.md) | Orquestrador | Ao encerrar a sessão — executa git workflow com branch, commits, merge e tag semver |
-
-> O protocolo de orquestração (quando e por quê cada hook é ativado) está na skill `lifecycle-hooks`. Os arquivos acima definem **o quê fazer** em cada hook.
-
----
-
-## Skills Disponíveis
-
-Skills são workflows especializados que os agentes invocam automaticamente. Não é necessário ativá-las manualmente.
-
-| Skill | Agentes que usam | Finalidade |
-|---|---|---|
-| `traduzir-entrada` | Orquestrador | Traduz input para inglês antes do processamento |
-| `lifecycle-hooks` | Orquestrador | Protocolo de quando/por quê cada hook é ativado — as instruções concretas ficam em `.github/hooks/` |
-| `decisao-linguagem` | Orquestrador, Backend | Seleciona linguagem backend ideal com matriz de decisão ponderada por criterios objetivos |
-| `security-lib-scan` | Todos os backends, Arquitetura | Pesquisa CVEs e reputação de dependências antes de adotar |
-| `project-context-bank` | Orquestrador, Cérebro, todos os backends, Arquitetura | Banco de contexto persistente: decisões, falhas, estado por camada, log de execução e histórico de validações |
-| `scaffold-clean-arch` | Arquitetura | Gera estrutura de pastas Clean Architecture |
-| `contrato-api` | Arquitetura, Backend, Frontend | Define contratos HTTP e interfaces de repositório |
-| `revisao-owasp` | Backend, Java Backend, Rust Backend | Checklist OWASP A01–A10 antes de fechar endpoints |
-| `gerar-migration-postgres` | Banco de Dados | Templates de migration PostgreSQL com boas práticas |
-| `scaffold-react` | Frontend | Setup de projeto React/Next.js com todas as dependências |
-| `scaffold-rust-api` | Rust Backend | Estrutura Clean Architecture com Axum + SQLx + PostgreSQL |
-| `branding-DevKit-react` | Frontend | Regras de aplicação da identidade visual DevKit em React |
-| `selecao-assets-marca` | Frontend | Escolhe logo/símbolo/ícone correto por contexto e tema |
-| `tokens-design-react` | Frontend | CSS variables e config Tailwind com tokens da marca |
-| `qa-identidade-visual` | Frontend | Checklist de validação visual antes de release |
-| `scaffold-k8s` | SRE | Gera manifests Kubernetes completos por cloud |
-| `dockerfile-review` | SRE | Revisa Dockerfiles existentes por segurança e performance |
-| `pipeline-cicd` | SRE | Gera pipelines CI/CD para AKS, EKS, GKE e OpenShift |
-| `k8s-troubleshoot` | SRE, SRE Investigador | Diagnóstico passo a passo para problemas no cluster |
-| `ssh-connect` | SRE | Conexão SSH segura por chave (Ed25519/RSA) ou usuário/senha |
-| `ansible` | SRE | Automação de infraestrutura com playbooks, roles e Ansible Vault |
-| `terraform` | SRE | Infraestrutura como código com módulos, state remoto e pipelines |
-| `azurecli` | SRE | Gerenciamento de recursos Azure: AKS, ACR, Key Vault, PostgreSQL |
-| `awscli` | SRE | Gerenciamento de recursos AWS: EKS, ECR, S3, Secrets Manager |
-| `gcpsdk` | SRE | Gerenciamento de recursos GCP: GKE, Artifact Registry, Secret Manager |
-| `githubactions` | SRE, Documentação | Pipelines CI/CD GitHub Actions multi-cloud |
-| `git-workflow` | Orquestrador, Documentação | Padrão de commits, branches, merge e tags semver |
-
----
-
-## Assets de Marca
-
-Os assets de identidade visual ficam em `.github/brand/` e são consumidos automaticamente pelo agente frontend e pelas skills de branding.
-
-```
-.github/brand/
-├── logos/         → logo-h-on-light.png, logo-h-on-dark.png, logo-v-* ...
-├── symbols/       → symbol-on-light.png, symbol-on-dark.png ...
-├── icons/light/   → search, alert, user, shield, analytics, donut, target
-├── icons/dark/    → mesmos 7 ícones para fundos escuros
-├── shapes/        → formas geométricas de apoio (circle, square, rect)
-├── fonts/         → Sora-Regular, Bold, SemiBold, ExtraBold (.ttf)
-└── guide.txt      → guia de identidade visual + mapa completo da estrutura
-```
-
-| Contexto | Asset correto |
+| Skill | Para quê |
 |---|---|
-| Header fundo claro | `logos/logo-h-on-light.png` |
-| Header fundo escuro | `logos/logo-h-on-dark.png` |
-| Favicon / avatar | `symbols/symbol-on-light.png` ou `symbol-on-dark.png` |
-| Ícone em superfície clara | `icons/light/<nome>.png` |
-| Ícone em superfície escura | `icons/dark/<nome>.png` |
+| `orquestrador` | Entrega que atravessa camadas: planeja, delega, valida cada camada |
+| `contexto` | Context Bank em `.devkit/context.md`: estado, decisões, o que não repetir |
+| `arquitetura` | Entrevista de requisitos, padrão arquitetural, stack, ADRs |
+| `banco-dados` | Modelagem PostgreSQL, migrations, diagrama ER |
+| `backend` | Descobre ou decide a linguagem e aponta a skill especialista |
+| `backend-node`, `backend-python`, `backend-go`, `backend-java`, `backend-dotnet`, `backend-rust` | Padrões, bibliotecas e estrutura de cada stack |
+| `frontend`, `frontend-blazor`, `frontend-mvc` | React/Next.js, Blazor WASM, ASP.NET Core MVC |
+| `sre` | Dockerfile, manifests Kubernetes (AKS, EKS, GKE, OpenShift), CI/CD |
+| `sre-investigador` | Causa raiz de falhas em cluster a partir de manifests e logs |
+| `tester` | Build, testes, lint e veredito `PASS`, `FAIL_FIXABLE` ou `FAIL_BLOCKED` |
+| `docs` | README, ADR, CHANGELOG, guias |
 
-Paleta oficial: `#7852EA` (roxo), `#000000`, `#FFFFFF`, cinzas `#E9F2F4` / `#F5F5F5` / `#F4F1FD`.  
-Tipografia: **Sora** (ExtraBold → títulos, SemiBold/Bold → subtítulos, Regular → corpo).
+**Tarefas pontuais**
 
----
+`contrato-api`, `gerar-migration-postgres`, `scaffold-clean-arch`, `scaffold-react`, `scaffold-rust-api`, `scaffold-k8s`, `dockerfile-review`, `pipeline-cicd`, `githubactions`, `terraform`, `ansible`, `revisao-owasp`, `security-lib-scan`, `git-workflow`, `identidade-visual`.
 
-## Exemplos de Uso
+**Referência**
 
-### Aplicação completa
+`api-design-principles`, `architecture-decision-records`, `database-design`, `frontend-design`, `test-driven-development`, `debugging-strategies`.
 
-**Agente:** `DevKit Orquestrador`
+Um dev full stack usa `orquestrador` e deixa as demais serem carregadas sob demanda. Um especialista chama direto a skill da sua camada (por exemplo `/backend-go` ou `/sre-investigador`), sem passar pelo fluxo inteiro.
 
-```
-Crie uma plataforma SaaS de gestão de tarefas com:
-- Backend em Node.js (Express + TypeScript)
-- Frontend em Next.js
-- PostgreSQL
-- Deploy no EKS com CI/CD pelo GitHub Actions
-```
+## Subagents
 
-O orquestrador vai: traduzir → **PRE_TASK (Cérebro)** → arquitetar → modelar banco → **POST_IMPLEMENT (Tester)** → **POST_VALIDATE (Cérebro)** → implementar backend → **POST_IMPLEMENT → POST_VALIDATE** → implementar frontend → gerar infra → documentar → **POST_SESSION (git-workflow)**.
+| Subagent | Modelo | Acesso | Papel |
+|---|---|---|---|
+| `devkit-explorador` | barato | leitura e comandos | Mapeia o projeto e devolve um resumo de até 40 linhas |
+| `devkit-validador` | barato | leitura e comandos | Roda build, testes e lint; devolve veredito e evidências |
+| `devkit-documentador` | barato | escrita | Atualiza a documentação a partir do código |
+| `devkit-implementador` | intermediário | escrita | Implementa uma camada carregando a skill da stack |
+| `devkit-revisor` | intermediário | leitura e comandos | Revisa diff: regra de negócio, OWASP, testes fracos |
 
----
+O ganho vem de dois lados: o trabalho volumoso (ler dezenas de arquivos, logs de teste) fica fora do contexto do modelo principal, e roda em um modelo mais barato. No Claude Code, `/tester` já roda dentro do `devkit-validador` (`context: fork`).
 
-### Só o banco de dados
+Para trocar os modelos, edite `kit/models.json` e rode `node scripts/sync.mjs`.
 
-**Agente:** `DevKit Banco de Dados` (ou via Orquestrador)
+## Hooks
 
-```
-Crie o schema para um sistema de e-commerce: produtos, categorias, pedidos, itens de pedido e usuários
-```
+Um único script, `.agents/hooks/devkit-hook.mjs`, atende as três ferramentas:
 
----
+| Momento | O que faz |
+|---|---|
+| Início da sessão | Injeta `.devkit/context.md` no contexto (até 8.000 caracteres) |
+| Antes de comando de terminal | Pede confirmação para comandos destrutivos: `git push --force`, `git reset --hard`, `git clean -f`, `rm -rf` em raiz/home/`.git`, `DROP DATABASE`, `terraform destroy`, entre outros |
+| Depois de editar arquivo (e, no Cursor, ao fim de cada subagent) | Anota os arquivos de código alterados em `.devkit/.session.json` |
+| Fim do turno | Se houve código alterado e o Context Bank não foi atualizado, lembra uma única vez por sessão de validar e registrar |
 
-### Revisar um Dockerfile existente
+Os hooks rodam localmente, como um processo Node comum: nenhum modelo participa e não há gasto de tokens na execução (só o conteúdo do Context Bank injetado entra no contexto). Node foi escolhido por ser o único interpretador que permite um script e uma configuração iguais em Windows, macOS e Linux.
 
-**Agente:** `DevKit SRE`
+Os hooks só agem quando o projeto tem `.devkit/context.md` (exceto a guarda de comandos, sempre ativa) e falham abertos: com erro, a ferramenta segue normalmente. Sem Node instalado eles simplesmente não agem, sem aviso; confira com `node --version`.
 
-```
-Revise o Dockerfile desta aplicação Python e corrija os problemas de segurança e tamanho
-```
+## Estrutura do repositório
 
----
-
-### Diagnosticar problema no Kubernetes
-
-**Agente:** `DevKit SRE Investigador`
-
-```
-O pod da API está em CrashLoopBackOff no namespace production.
-Segue o Deployment, o Service e os logs do pod:
-[cole os YAMLs e logs aqui]
-```
-
-```
-Ingress retornando 503 — pods estão Running mas o tráfego não chega.
-Segue o Ingress e o Service do namespace staging:
-[cole os YAMLs aqui]
-```
-
----
-
-### Gerar pipeline CI/CD
-
-**Agente:** `DevKit SRE`
-
-```
-Crie o pipeline GitHub Actions para build e deploy automático da API no GKE com Workload Identity Federation
+```text
+.agents/skills/       skills (fonte de verdade; Cursor e Antigravity leem daqui)
+.agents/hooks/        script de hooks compartilhado
+kit/agents/           subagents (fonte de verdade)
+kit/models.json       modelo de cada tier por ferramenta
+kit/templates/        AGENTS.md, config.md e brand.md instalados nos projetos
+kit/cursor-plugin/    manifesto e hooks do plugin do Cursor
+plugins/devkit/       plugin do Cursor (gerado)
+scripts/sync.mjs      gera .claude/skills, .claude/agents, .cursor/agents, .agents/agents, plugins/devkit
+scripts/install.mjs   instala o kit em outro projeto
 ```
 
----
+Depois de editar uma skill ou um subagent:
 
-### Implementar backend Java
-
-**Agente:** `DevKit Java Backend` (ou via `DevKit Backend`)
-
-```
-Implemente o domínio de pedidos com Spring Boot 3.x, usando eventos de domínio e Virtual Threads do Java 21
+```bash
+node scripts/sync.mjs
 ```
 
----
-
-### Implementar backend Rust
-
-**Agente:** `DevKit Rust Backend` (ou via `DevKit Backend`)
-
-```
-Crie uma API REST de autenticação com Axum + SQLx + PostgreSQL seguindo Clean Architecture
+```bash
+node scripts/sync.mjs --check
 ```
 
----
+## Pontos a conferir na sua instalação
 
-### Criar interface com identidade visual
+- **Modelo barato no Cursor:** o Cursor aceita `inherit` ou um ID de modelo. `kit/models.json` usa `claude-haiku-5-5`, que não foi confirmado; liste os IDs com `agent models` (CLI do Cursor) e ajuste se for diferente.
+- **Plugin do Cursor:** o layout segue a referência oficial, mas não foi testado em um Cursor real. Dois pontos que a documentação não esclarece: se subagents de plugin respeitam o campo `model`, e se `${CURSOR_PLUGIN_ROOT}` é expandido nos comandos de hook no Windows.
+- **Skills duplicadas no Cursor:** o Cursor também lê `.claude/skills/`. Se as skills aparecerem em dobro, instale com `--tools cursor,antigravity` nos projetos em que não usa o Claude Code, ou desligue a opção de configurações de terceiros no Cursor.
+- **Hooks no Antigravity:** a documentação não informa o diretório de trabalho dos hooks; a configuração assume a raiz do workspace. Confira com `/hooks` na CLI.
+- **Subagents no Antigravity IDE:** a documentação lista subagents só para o App e a CLI (`agy`). No IDE, as skills funcionam e o orquestrador executa os papéis em linha.
 
-**Agente:** `DevKit Frontend`
-
-```
-Crie a tela de login com a identidade visual DevKit aplicada corretamente
-```
-
-O agente consultará `.github/brand/guide.txt`, escolherá os assets corretos e validará contraste, tipografia e dimensões mínimas antes de entregar.
-
----
-
-### Documentar o projeto
-
-**Agente:** `DevKit Documentação`
-
-```
-Leia o código do repositório e gere o README com setup, arquitetura, endpoints principais e guia de contribuição
-```
+Veja o [CHANGELOG](CHANGELOG.md) para o histórico e a lista do que foi removido na versão 2.0.

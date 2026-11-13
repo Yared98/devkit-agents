@@ -1,0 +1,5 @@
+{
+  "tester": { "context": "fork", "agent": "devkit-validador", "argument-hint": "[o que validar]" },
+  "orquestrador": { "argument-hint": "[o que construir]" },
+  "sre-investigador": { "argument-hint": "[sintoma, namespace ou recurso]" }
+}

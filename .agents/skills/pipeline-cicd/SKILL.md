@@ -1,7 +1,6 @@
 ---
 name: pipeline-cicd
 description: "Gera pipelines CI/CD completos adaptados ao cloud provider e stack da aplicação. Suporta AKS (Azure DevOps / GitHub Actions + ACR), EKS (GitHub Actions + ECR), GKE (GitHub Actions / Cloud Build + Artifact Registry) e OpenShift (Tekton Pipelines ou GitHub Actions + oc CLI). Use quando: precisar automatizar build, push de imagem e deploy de uma aplicação containerizada."
-user-invocable: true
 ---
 
 # Geração de Pipeline CI/CD

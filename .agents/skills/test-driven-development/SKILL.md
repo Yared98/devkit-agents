@@ -1,9 +1,6 @@
 ---
 name: test-driven-development
-description: "Use when implementing any feature or bugfix, before writing implementation code"
-risk: unknown
-source: community
-date_added: "2026-02-27"
+description: "Ciclo TDD (red, green, refactor) e antipadrões de teste. Use quando: implementar uma feature ou correção de bug com teste escrito antes do código."
 ---
 
 # Test-Driven Development (TDD)

@@ -1,7 +1,6 @@
 ---
 name: security-lib-scan
 description: "Pesquisa CVEs, vulnerabilidades e reputacao de bibliotecas antes de adota-las. Use quando: escolher uma dependencia nova, auditar dependencias existentes, investigar se uma lib tem historico de problemas de seguranca, encontrar alternativas seguras para uma lib vulneravel."
-user-invocable: true
 ---
 
 # Security Library Scan

@@ -1,40 +1,28 @@
-﻿# DevKit — Instruções para o Agent (Cursor)
+﻿# DevKit — instruções para agentes
 
-Este projeto usa o **DevKit**, sistema multi-agente para desenvolvimento completo.
+Este repositório é o próprio kit: skills, subagents e hooks para desenvolvimento full stack em Claude Code, Cursor e Antigravity. Ele é instalado em outros projetos com `node scripts/install.mjs <pasta>`.
 
-Leia **`CURSOR.md`** para protocolo completo, instalação (por projeto e global) e instruções detalhadas para o LLM.
+## Fontes de verdade (edite só aqui)
 
-## Ativar um agente
+| O quê | Onde | Observação |
+|---|---|---|
+| Skills | `.agents/skills/<nome>/SKILL.md` | Formato Agent Skills padrão: frontmatter só com `name` e `description`. Cursor e Antigravity leem direto daqui. |
+| Subagents | `kit/agents/<nome>.md` | Frontmatter neutro: `name`, `description`, `tier` (`cheap` ou `standard`), `access` (`read`, `exec` ou `write`), `skills`. |
+| Modelo por ferramenta | `kit/models.json` | Mapeia `tier` para o modelo de cada ferramenta. |
+| Campos só do Claude Code | `kit/claude-skill-overrides.json` | Ex.: `context: fork`, `agent`, `argument-hint`. |
+| Hooks | `.agents/hooks/devkit-hook.mjs` | Um script Node para as três ferramentas; a ligação fica em `.claude/settings.json`, `.cursor/hooks.json` e `.agents/hooks.json`. |
+| Instruções instaladas nos projetos | `kit/templates/` | `AGENTS.md`, `config.md`, `brand.md`. |
 
-| Forma | Exemplo |
-|---|---|
-| @-mention de rule | `@devkit-orquestrador` |
-| Custom Mode | Settings → Chat → Custom Modes |
-| Prompt explícito | "Atue como DevKit Orquestrador" |
+## Arquivos gerados (não edite)
 
-## Mapeamento rápido
+`.claude/skills/`, `.claude/agents/`, `.cursor/agents/`, `.agents/agents/` e `plugins/devkit/` (plugin do Cursor, com manifesto e hooks vindos de `kit/cursor-plugin/`) saem de `node scripts/sync.mjs`. Depois de mudar qualquer fonte, rode o sync e confira com `node scripts/sync.mjs --check` antes de commitar.
 
-| Pedido | Rule / Arquivo |
-|---|---|
-| app completa | `@devkit-orquestrador` → `devkit-orquestrador.agent.md` |
-| arquitetura | `@devkit-arquitetura` |
-| banco de dados | `@devkit-banco-dados` |
-| backend (geral) | `@devkit-backend` |
-| backend .NET | `@devkit-backend-dotnet` |
-| backend Node.js | `@devkit-backend-node` |
-| backend Python | `@devkit-backend-python` |
-| backend Go | `@devkit-backend-go` |
-| backend Java | `@devkit-backend-java` |
-| backend Rust | `@devkit-backend-rust` |
-| frontend React | `@devkit-frontend` |
-| frontend MVC | `@devkit-frontend-mvc` |
-| frontend Blazor | `@devkit-frontend-blazor` |
-| SRE / K8s | `@devkit-sre` |
-| SRE investigador | `@devkit-sre-investigador` |
-| testar / validar | `@devkit-tester` |
-| documentação | `@devkit-documentacao` |
-| estado do projeto | `@devkit-cerebro` |
+## Regras para mudar o kit
 
-Sempre leia o `.agent.md` correspondente em `.github/agents/` e execute os hooks em `.github/hooks/`.
-
-Edite `toolkit.config.md` com dados do seu projeto.
+- Uma skill precisa justificar o custo: conhecimento específico do DevKit ou um procedimento que o modelo erra sem ela. Referência genérica que o modelo já sabe não entra.
+- A `description` é o gatilho: diga o que a skill faz e quando usar ("Use quando: ..."). O nome da pasta é igual ao `name`.
+- Corpo de skill enxuto; detalhe extenso vai em arquivo ao lado, referenciado por link relativo.
+- Subagent recebe pedido autocontido e devolve resumo curto. Tudo que só lê, roda comando ou escreve documentação usa `tier: cheap`.
+- O hook sempre falha aberto (sai com 0 e sem saída) e não depende de pacote npm.
+- Idioma: português, com acentuação.
+- Ao adicionar ou remover skill ou subagent, atualize o README e o CHANGELOG.

@@ -1,7 +1,6 @@
 ---
 name: scaffold-k8s
 description: "Gera manifests Kubernetes completos (Deployment, Service, Ingress, ConfigMap, Secret, HPA, Namespace) adaptados por plataforma: AKS, EKS, GKE e OpenShift. Use quando: o agente SRE identificou a cloud alvo e precisa gerar os arquivos k8s com as convenções e anotações corretas de cada provider."
-user-invocable: true
 ---
 
 # Scaffold Kubernetes por Cloud

@@ -1,7 +1,6 @@
 ---
 name: scaffold-rust-api
 description: "Cria estrutura completa de projeto Rust seguindo Clean Architecture com Axum + SQLx + PostgreSQL. Usa cargo via WSL para inicializar o projeto. Use quando: iniciar um novo projeto Rust, configurar Axum, definir estrutura de handlers, repositórios e use cases."
-user-invocable: true
 ---
 
 # Scaffold Rust API

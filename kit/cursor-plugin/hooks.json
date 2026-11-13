@@ -1,0 +1,9 @@
+{
+  "hooks": {
+    "sessionStart": [{ "command": "node \"${CURSOR_PLUGIN_ROOT}/hooks/devkit-hook.mjs\" cursor session-start", "timeout": 10 }],
+    "beforeShellExecution": [{ "command": "node \"${CURSOR_PLUGIN_ROOT}/hooks/devkit-hook.mjs\" cursor guard", "timeout": 10 }],
+    "afterFileEdit": [{ "command": "node \"${CURSOR_PLUGIN_ROOT}/hooks/devkit-hook.mjs\" cursor track", "timeout": 10 }],
+    "subagentStop": [{ "command": "node \"${CURSOR_PLUGIN_ROOT}/hooks/devkit-hook.mjs\" cursor track", "timeout": 10 }],
+    "stop": [{ "command": "node \"${CURSOR_PLUGIN_ROOT}/hooks/devkit-hook.mjs\" cursor stop", "timeout": 10, "loop_limit": 1 }]
+  }
+}

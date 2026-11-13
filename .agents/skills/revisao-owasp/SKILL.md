@@ -1,7 +1,6 @@
 ---
 name: revisao-owasp
 description: "Revisa código backend em busca de vulnerabilidades do OWASP Top 10. Use quando: código de endpoint foi escrito, autenticação foi implementada, validações foram adicionadas, ou antes de considerar qualquer feature como completa. Aplicável a qualquer linguagem."
-user-invocable: true
 ---
 
 # Revisão de Segurança OWASP Top 10
