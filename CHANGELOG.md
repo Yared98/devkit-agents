@@ -16,6 +16,7 @@ Reestruturação para skills, subagents e hooks nativos de Claude Code, Cursor e
 - **Hooks reais** (`.agents/hooks/devkit-hook.mjs`): injeção do Context Bank no início da sessão, confirmação para comandos destrutivos, registro de arquivos alterados e lembrete de validação e registro ao fim do turno.
 - **Skills novas:** `contexto` (substitui o agente Cérebro e as skills `project-context-bank` e `lifecycle-hooks`) e `identidade-visual` (une as quatro skills de marca).
 - **Plugin do Cursor**: `.cursor-plugin/marketplace.json` na raiz e o plugin `devkit` gerado em `plugins/devkit/` (skills, subagents e hooks), para instalar pelo Customize do Cursor sem copiar arquivos.
+- **Subagents por stack**: 11 implementadores (`devkit-backend-*`, `devkit-frontend*`, `devkit-banco-dados`, `devkit-sre`), cada um com a skill da stack pré-carregada, gerados de `kit/stack-agent.md` e `kit/stack-agents.json`. O `orquestrador` passa a delegar para eles.
 - **Plugin do Claude Code**: `.claude-plugin/marketplace.json` na raiz e o plugin `devkit` gerado em `plugins/devkit-claude/`, instalável com `claude plugin install devkit@devkit-agents`.
 - **Hooks sem disparo duplo**: quando o plugin e a instalação por projeto coexistem, o script do plugin se cala e vale o do projeto.
 - **Hook `subagentStop` no Cursor**: registra os arquivos alterados por subagents.

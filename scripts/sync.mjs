@@ -82,14 +82,21 @@ export function generate() {
   out.set('plugins/devkit-claude/hooks/devkit-hook.mjs', read('.agents/hooks/devkit-hook.mjs'));
 
   const agentsDir = path.join(kitRoot, 'kit', 'agents');
-  for (const file of fs.readdirSync(agentsDir).filter((f) => f.endsWith('.md'))) {
-    const { data, body } = splitFrontmatter(fs.readFileSync(path.join(agentsDir, file), 'utf8'));
+  const sources = fs.readdirSync(agentsDir).filter((f) => f.endsWith('.md')).map((f) => [f, fs.readFileSync(path.join(agentsDir, f), 'utf8')]);
+  // One implementer per stack, each with its stack skill preloaded (kit/stack-agents.json + kit/stack-agent.md).
+  const stackTemplate = norm(fs.readFileSync(path.join(kitRoot, 'kit', 'stack-agent.md'), 'utf8'));
+  for (const s of readJson('kit/stack-agents.json')) {
+    const text = stackTemplate.replaceAll('{{skill}}', s.skill).replaceAll('{{stack}}', s.stack).replaceAll('{{quando}}', s.quando);
+    sources.push([`devkit-${s.skill}.md`, text, 'kit/stack-agent.md e kit/stack-agents.json']);
+  }
+  for (const [file, text, origin = `kit/agents/${file}`] of sources) {
+    const { data, body } = splitFrontmatter(text);
     const { name, description, tier = 'standard', access = 'write', skills } = data;
     if (!name || !description || !models[tier] || !(access in CLAUDE_TOOLS)) throw new Error(`kit/agents/${file}: frontmatter inválido`);
     for (const s of (skills ?? '').split(',').map((x) => x.trim()).filter(Boolean)) {
       if (!fs.existsSync(path.join(skillsDir, s, 'SKILL.md'))) throw new Error(`kit/agents/${file}: skill "${s}" não existe`);
     }
-    const note = `<!-- Gerado por scripts/sync.mjs a partir de kit/agents/${file}. Não edite aqui. -->\n`;
+    const note = `<!-- Gerado por scripts/sync.mjs a partir de ${origin}. Não edite aqui. -->\n`;
     const m = models[tier];
     out.set(`.claude/agents/${file}`, Buffer.from(frontmatter([['name', name], ['description', description], ['model', m.claude], ['tools', CLAUDE_TOOLS[access]], ['skills', skills]]) + note + body));
     const pluginSkills = skills ? skills.split(',').map((s) => `${CLAUDE_PLUGIN}:${s.trim()}`).join(', ') : undefined;

@@ -25,21 +25,21 @@ Você planeja, delega, revisa e integra. O modelo principal é o recurso caro: g
 
 ## Camadas e skills
 
-| Ordem | Camada | Skill que o implementador carrega |
-|---|---|---|
-| 1 | Arquitetura e stack | `arquitetura` (feita por você, no modelo principal: é decisão) |
-| 2 | Contrato de API | `contrato-api` (por você; destrava backend e frontend em paralelo) |
-| 3 | Banco de dados | `banco-dados` |
-| 4 | Backend | `backend` para escolher a linguagem, depois `backend-node`, `backend-python`, `backend-go`, `backend-java`, `backend-dotnet` ou `backend-rust` |
-| 4 | Frontend | `frontend`, `frontend-blazor` ou `frontend-mvc` |
-| 5 | Infra | `sre` (e `sre-investigador` para falha em cluster) |
-| 6 | Documentação | `docs` |
+| Ordem | Camada | Skill | Subagent que implementa |
+|---|---|---|---|
+| 1 | Arquitetura e stack | `arquitetura` | você, no modelo principal (é decisão) |
+| 2 | Contrato de API | `contrato-api` | você (destrava backend e frontend em paralelo) |
+| 3 | Banco de dados | `banco-dados` | `devkit-banco-dados` |
+| 4 | Backend | `backend` para escolher a linguagem | `devkit-backend-node`, `devkit-backend-python`, `devkit-backend-go`, `devkit-backend-java`, `devkit-backend-dotnet` ou `devkit-backend-rust` |
+| 4 | Frontend | conforme a stack | `devkit-frontend`, `devkit-frontend-blazor` ou `devkit-frontend-mvc` |
+| 5 | Infra | `sre-investigador` para falha em cluster | `devkit-sre` |
+| 6 | Documentação | `docs` | `devkit-documentador` |
 
-Backend e frontend podem rodar em paralelo depois que o contrato em `docs/contracts/` existir. Banco vem antes do backend.
+Cada subagent de stack tem o mesmo nome da skill com o prefixo `devkit-` e já parte com ela carregada. Backend e frontend podem rodar em paralelo depois que o contrato em `docs/contracts/` existir. Banco vem antes do backend.
 
 ## Ciclo de cada camada
 
-1. **Implementar.** Delegue ao subagent `devkit-implementador` com um pedido autocontido: a skill a carregar, a tarefa, os arquivos que pode tocar, o contrato e as decisões do Context Bank que se aplicam, e o comando de verificação. O subagent não vê esta conversa: o que não estiver no pedido, ele não sabe.
+1. **Implementar.** Delegue ao subagent da stack (tabela acima) com um pedido autocontido: a tarefa, os arquivos que pode tocar, o contrato e as decisões do Context Bank que se aplicam, e o comando de verificação. O subagent não vê esta conversa: o que não estiver no pedido, ele não sabe.
 2. **Validar.** Delegue ao `devkit-validador` (modelo barato). Ele devolve `PASS`, `FAIL_FIXABLE` ou `FAIL_BLOCKED`.
    - `FAIL_FIXABLE`: devolva o erro ao implementador. Na segunda falha da mesma tarefa, corrija você mesmo em vez de repetir o pedido.
    - `FAIL_BLOCKED`: pare, mostre o erro exato ao usuário e aguarde.
@@ -51,7 +51,8 @@ Backend e frontend podem rodar em paralelo depois que o contrato em `docs/contra
 | Trabalho | Quem | Modelo |
 |---|---|---|
 | Decisão de arquitetura, contrato, integração entre camadas, revisão final | Você | principal |
-| Implementação de uma camada | `devkit-implementador` | intermediário |
+| Implementação de uma camada | subagent da stack (ex.: `devkit-backend-go`) | intermediário |
+| Implementação fora das stacks do kit | `devkit-implementador` (genérico; nomeie no pedido a skill a carregar, se houver) | intermediário |
 | Revisão de segurança e de regra de negócio | `devkit-revisor` | intermediário, só leitura |
 | Mapear o projeto, buscar onde algo está | `devkit-explorador` | barato, só leitura |
 | Rodar build, testes e lint e resumir o resultado | `devkit-validador` | barato |

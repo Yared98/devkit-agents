@@ -1,0 +1,13 @@
+[
+  { "skill": "backend-node", "stack": "backend Node.js/TypeScript (Fastify ou NestJS)", "quando": "o trabalho é escrever API, serviço ou teste em Node.js/TypeScript" },
+  { "skill": "backend-python", "stack": "backend Python (FastAPI ou Django REST Framework)", "quando": "o trabalho é escrever API, serviço ou teste em Python" },
+  { "skill": "backend-go", "stack": "backend Go (Gin ou Fiber)", "quando": "o trabalho é escrever API, serviço ou teste em Go" },
+  { "skill": "backend-java", "stack": "backend Java (Quarkus ou Spring Boot)", "quando": "o trabalho é escrever API, serviço ou teste em Java" },
+  { "skill": "backend-dotnet", "stack": "backend .NET (ASP.NET Core)", "quando": "o trabalho é escrever API, serviço ou teste em C#" },
+  { "skill": "backend-rust", "stack": "backend Rust (Axum e SQLx)", "quando": "o trabalho é escrever API, serviço ou teste em Rust" },
+  { "skill": "frontend", "stack": "frontend React/Next.js", "quando": "o trabalho é escrever telas, componentes ou integração com API em React ou Next.js" },
+  { "skill": "frontend-blazor", "stack": "frontend Blazor WebAssembly", "quando": "o trabalho é escrever telas ou componentes em Blazor WASM" },
+  { "skill": "frontend-mvc", "stack": "frontend ASP.NET Core MVC", "quando": "o trabalho é escrever Views Razor, ViewModels ou Tag Helpers em ASP.NET Core MVC" },
+  { "skill": "banco-dados", "stack": "banco de dados (PostgreSQL por padrão)", "quando": "o trabalho é escrever schema, migrations, índices ou diagrama ER" },
+  { "skill": "sre", "stack": "infraestrutura (Dockerfile, Kubernetes e CI/CD)", "quando": "o trabalho é escrever Dockerfile, manifests Kubernetes ou pipeline de entrega" }
+]

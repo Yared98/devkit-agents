@@ -8,6 +8,7 @@ Este repositório é o próprio kit: skills, subagents e hooks para desenvolvime
 |---|---|---|
 | Skills | `.agents/skills/<nome>/SKILL.md` | Formato Agent Skills padrão: frontmatter só com `name` e `description`. Cursor e Antigravity leem direto daqui. |
 | Subagents | `kit/agents/<nome>.md` | Frontmatter neutro: `name`, `description`, `tier` (`cheap` ou `standard`), `access` (`read`, `exec` ou `write`), `skills`. |
+| Subagents por stack | `kit/stack-agent.md` e `kit/stack-agents.json` | Um modelo de texto e uma lista; cada linha gera `devkit-<skill>` com a skill pré-carregada. |
 | Modelo por ferramenta | `kit/models.json` | Mapeia `tier` para o modelo de cada ferramenta. |
 | Campos só do Claude Code | `kit/claude-skill-overrides.json` | Ex.: `context: fork`, `agent`, `argument-hint`. |
 | Hooks | `.agents/hooks/devkit-hook.mjs` | Um script Node para as três ferramentas; a ligação fica em `.claude/settings.json`, `.cursor/hooks.json` e `.agents/hooks.json`. |

@@ -88,7 +88,10 @@ Um dev full stack usa `orquestrador` e deixa as demais serem carregadas sob dema
 | `devkit-explorador` | barato | leitura e comandos | Mapeia o projeto e devolve um resumo de até 40 linhas |
 | `devkit-validador` | barato | leitura e comandos | Roda build, testes e lint; devolve veredito e evidências |
 | `devkit-documentador` | barato | escrita | Atualiza a documentação a partir do código |
-| `devkit-implementador` | intermediário | escrita | Implementa uma camada carregando a skill da stack |
+| `devkit-backend-node`, `-python`, `-go`, `-java`, `-dotnet`, `-rust` | intermediário | escrita | Implementa backend na stack, com a skill correspondente pré-carregada |
+| `devkit-frontend`, `devkit-frontend-blazor`, `devkit-frontend-mvc` | intermediário | escrita | Implementa frontend na stack, com a skill pré-carregada |
+| `devkit-banco-dados`, `devkit-sre` | intermediário | escrita | Implementa schema e migrations; Dockerfile, manifests e CI/CD |
+| `devkit-implementador` | intermediário | escrita | Genérico, para o que não tem subagent de stack |
 | `devkit-revisor` | intermediário | leitura e comandos | Revisa diff: regra de negócio, OWASP, testes fracos |
 
 O ganho vem de dois lados: o trabalho volumoso (ler dezenas de arquivos, logs de teste) fica fora do contexto do modelo principal, e roda em um modelo mais barato. No Claude Code, `/tester` já roda dentro do `devkit-validador` (`context: fork`).
@@ -103,9 +106,10 @@ Para trocar os modelos, edite `kit/models.json` e rode `node scripts/sync.mjs`.
 | `devkit-revisor` | `revisao-owasp` | injetada ao iniciar | por instrução |
 | `devkit-documentador` | `docs` | injetada ao iniciar | por instrução |
 | `devkit-explorador` | `contexto` | injetada ao iniciar | por instrução |
-| `devkit-implementador` | a da stack (ex.: `backend-go`) | carregada pelo subagent, conforme o pedido de quem delegou | idem |
+| subagents de stack (ex.: `devkit-backend-go`) | a de mesmo nome (`backend-go`) | injetada ao iniciar | por instrução |
+| `devkit-implementador` | nenhuma fixa | carrega a que o pedido nomear | idem |
 
-Só o Claude Code tem injeção garantida pelo harness. O implementador não recebe skill pré-carregada de propósito: a stack muda a cada tarefa, e carregar todas custaria caro. Quem delega (a skill `orquestrador`) deve nomear a skill no pedido.
+Só o Claude Code tem injeção garantida pelo harness. Os 11 subagents de stack saem de um único modelo (`kit/stack-agent.md`) e de uma lista (`kit/stack-agents.json`); para acrescentar uma stack, crie a skill, adicione uma linha à lista e rode o sync.
 
 ## Hooks
 
@@ -128,6 +132,7 @@ Os hooks só agem quando o projeto tem `.devkit/context.md` (exceto a guarda de 
 .agents/skills/       skills (fonte de verdade; Cursor e Antigravity leem daqui)
 .agents/hooks/        script de hooks compartilhado
 kit/agents/           subagents (fonte de verdade)
+kit/stack-agent.md    modelo dos subagents por stack (lista em kit/stack-agents.json)
 kit/models.json       modelo de cada tier por ferramenta
 kit/templates/        AGENTS.md, config.md e brand.md instalados nos projetos
 kit/cursor-plugin/    manifesto e hooks do plugin do Cursor
