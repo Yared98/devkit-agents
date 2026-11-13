@@ -15,7 +15,7 @@ Este repositório é o próprio kit: skills, subagents e hooks para desenvolvime
 
 ## Arquivos gerados (não edite)
 
-`.claude/skills/`, `.claude/agents/`, `.cursor/agents/`, `.agents/agents/` e `plugins/devkit/` (plugin do Cursor, com manifesto e hooks vindos de `kit/cursor-plugin/`) saem de `node scripts/sync.mjs`. Depois de mudar qualquer fonte, rode o sync e confira com `node scripts/sync.mjs --check` antes de commitar.
+`.claude/skills/`, `.claude/agents/`, `.cursor/agents/`, `.agents/agents/`, `plugins/devkit/` (plugin do Cursor, com manifesto e hooks de `kit/cursor-plugin/`) e `plugins/devkit-claude/` (plugin do Claude Code, de `kit/claude-plugin/`) saem de `node scripts/sync.mjs`. Depois de mudar qualquer fonte, rode o sync e confira com `node scripts/sync.mjs --check` antes de commitar.
 
 ## Regras para mudar o kit
 

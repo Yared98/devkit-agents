@@ -9,7 +9,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export const kitRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-export const GENERATED_DIRS = ['.claude/skills', '.claude/agents', '.cursor/agents', '.agents/agents', 'plugins/devkit'];
+export const GENERATED_DIRS = ['.claude/skills', '.claude/agents', '.cursor/agents', '.agents/agents', 'plugins/devkit', 'plugins/devkit-claude'];
+const CLAUDE_PLUGIN = 'devkit'; // must match "name" in kit/claude-plugin/plugin.json
 
 const norm = (s) => s.replace(/^﻿/, '').replace(/\r\n/g, '\n');
 const readJson = (p) => JSON.parse(norm(fs.readFileSync(path.join(kitRoot, p), 'utf8')));
@@ -53,14 +54,19 @@ export function generate() {
   for (const rel of walk(skillsDir)) {
     const [skill, ...rest] = rel.split('/');
     let buf = fs.readFileSync(path.join(skillsDir, rel));
+    let pluginBuf = buf;
     if (rest.join('/') === 'SKILL.md') {
       const { raw, data, body } = splitFrontmatter(buf.toString('utf8'));
       if (data.name !== skill) throw new Error(`${rel}: name "${data.name}" difere da pasta "${skill}"`);
       if (!data.description) throw new Error(`${rel}: sem description`);
       const extra = Object.entries(overrides[skill] ?? {}).map(([k, v]) => `${k}: ${yamlValue(v)}`);
       buf = Buffer.from(`---\n${[raw, ...extra].join('\n')}\n---\n${body}`);
+      // Inside a Claude Code plugin, agents are registered as "<plugin>:<name>".
+      const pluginExtra = extra.map((l) => l.replace(/^agent: /, `agent: ${CLAUDE_PLUGIN}:`));
+      pluginBuf = Buffer.from(`---\n${[raw, ...pluginExtra].join('\n')}\n---\n${body}`);
     }
     out.set(`.claude/skills/${rel}`, buf);
+    out.set(`plugins/devkit-claude/skills/${rel}`, pluginBuf);
     out.set(`plugins/devkit/skills/${rel}`, fs.readFileSync(path.join(skillsDir, rel)));
   }
 
@@ -69,6 +75,11 @@ export function generate() {
   out.set('plugins/devkit/.cursor-plugin/plugin.json', read('kit/cursor-plugin/plugin.json'));
   out.set('plugins/devkit/hooks/hooks.json', read('kit/cursor-plugin/hooks.json'));
   out.set('plugins/devkit/hooks/devkit-hook.mjs', read('.agents/hooks/devkit-hook.mjs'));
+
+  // Claude Code plugin, listed in .claude-plugin/marketplace.json
+  out.set('plugins/devkit-claude/.claude-plugin/plugin.json', read('kit/claude-plugin/plugin.json'));
+  out.set('plugins/devkit-claude/hooks/hooks.json', read('kit/claude-plugin/hooks.json'));
+  out.set('plugins/devkit-claude/hooks/devkit-hook.mjs', read('.agents/hooks/devkit-hook.mjs'));
 
   const agentsDir = path.join(kitRoot, 'kit', 'agents');
   for (const file of fs.readdirSync(agentsDir).filter((f) => f.endsWith('.md'))) {
@@ -81,6 +92,8 @@ export function generate() {
     const note = `<!-- Gerado por scripts/sync.mjs a partir de kit/agents/${file}. Não edite aqui. -->\n`;
     const m = models[tier];
     out.set(`.claude/agents/${file}`, Buffer.from(frontmatter([['name', name], ['description', description], ['model', m.claude], ['tools', CLAUDE_TOOLS[access]], ['skills', skills]]) + note + body));
+    const pluginSkills = skills ? skills.split(',').map((s) => `${CLAUDE_PLUGIN}:${s.trim()}`).join(', ') : undefined;
+    out.set(`plugins/devkit-claude/agents/${file}`, Buffer.from(frontmatter([['name', name], ['description', description], ['model', m.claude], ['tools', CLAUDE_TOOLS[access]], ['skills', pluginSkills]]).replace(/skills: "(.*)"/, 'skills: $1') + note + body));
     for (const dir of ['.cursor/agents', 'plugins/devkit/agents']) out.set(`${dir}/${file}`, Buffer.from(frontmatter([['name', name], ['description', description], ['model', m.cursor], ['readonly', access === 'read' ? 'true' : undefined]]) + note + body));
     out.set(`.agents/agents/${file}`, Buffer.from(frontmatter([['name', name], ['description', description], ['model', m.antigravity], ['mainAgent', 'false'], ['subagent', 'true'], ['tools', `[${ANTIGRAVITY_TOOLS[access].join(', ')}]`]]).replace(/tools: "(\[.*\])"/, 'tools: $1') + note + body));
   }

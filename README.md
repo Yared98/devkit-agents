@@ -18,11 +18,25 @@ node devkit-agents/scripts/install.mjs caminho/do/projeto
 
 Para instalar só para algumas ferramentas, acrescente `--tools claude,cursor` (valores: `claude`, `cursor`, `antigravity`). O instalador nunca sobrescreve `AGENTS.md`, `CLAUDE.md`, `.devkit/*` nem arquivos de hooks que já existam, a menos que você passe `--force`.
 
-### Alternativa no Cursor: plugin
+### Alternativa: instalar como plugin
 
-O repositório também é um marketplace de plugins do Cursor (`.cursor-plugin/marketplace.json`), com o plugin `devkit` em `plugins/devkit/` (skills, subagents e hooks). Instale em Customize → Install a partir do repositório no GitHub, por projeto ou para o seu usuário, ou copie `plugins/devkit` para `~/.cursor/plugins/local/devkit` e recarregue a janela para testar localmente.
+O repositório também é um marketplace de plugins para Claude Code e Cursor. O plugin `devkit` leva as skills, os subagents e os hooks, sem copiar arquivos para o projeto.
 
-Use o plugin **ou** o instalador no mesmo projeto, não os dois: com ambos, os hooks rodam em dobro e as skills podem aparecer duplicadas. O plugin não cria `AGENTS.md` nem `.devkit/`; crie o Context Bank pedindo a skill `contexto`.
+**Claude Code** (plugin em `plugins/devkit-claude/`):
+
+```bash
+claude plugin marketplace add Yared98/devkit-agents
+```
+
+```bash
+claude plugin install devkit@devkit-agents
+```
+
+Acrescente `--scope project` ao segundo comando para instalar só no projeto atual. Dentro do plugin, as skills e os subagents ganham o prefixo `devkit:` (por exemplo `/devkit:orquestrador` e `devkit:devkit-validador`). Para testar a partir de um clone local: `claude --plugin-dir plugins/devkit-claude`.
+
+**Cursor** (plugin em `plugins/devkit/`): Customize → Install a partir do repositório no GitHub, por projeto ou para o seu usuário. Para testar localmente, copie `plugins/devkit` para `~/.cursor/plugins/local/devkit` e recarregue a janela.
+
+O plugin não cria `AGENTS.md` nem `.devkit/`; crie o Context Bank pedindo a skill `contexto`. Se um projeto tiver o plugin e também a instalação por `install.mjs`, os hooks do plugin se calam e valem os do projeto; as skills aparecem nas duas formas (com e sem prefixo), então prefira uma das duas instalações.
 
 Depois, edite `.devkit/config.md` (stack e convenções) e `.devkit/brand.md` (identidade visual) e, na ferramenta, peça `/orquestrador <o que construir>`.
 
@@ -81,6 +95,18 @@ O ganho vem de dois lados: o trabalho volumoso (ler dezenas de arquivos, logs de
 
 Para trocar os modelos, edite `kit/models.json` e rode `node scripts/sync.mjs`.
 
+### Como as skills chegam aos subagents
+
+| Subagent | Skill | Claude Code | Cursor e Antigravity |
+|---|---|---|---|
+| `devkit-validador` | `tester` | injetada inteira ao iniciar (`skills:` no frontmatter) | o subagent a carrega por instrução do próprio texto |
+| `devkit-revisor` | `revisao-owasp` | injetada ao iniciar | por instrução |
+| `devkit-documentador` | `docs` | injetada ao iniciar | por instrução |
+| `devkit-explorador` | `contexto` | injetada ao iniciar | por instrução |
+| `devkit-implementador` | a da stack (ex.: `backend-go`) | carregada pelo subagent, conforme o pedido de quem delegou | idem |
+
+Só o Claude Code tem injeção garantida pelo harness. O implementador não recebe skill pré-carregada de propósito: a stack muda a cada tarefa, e carregar todas custaria caro. Quem delega (a skill `orquestrador`) deve nomear a skill no pedido.
+
 ## Hooks
 
 Um único script, `.agents/hooks/devkit-hook.mjs`, atende as três ferramentas:
@@ -105,8 +131,10 @@ kit/agents/           subagents (fonte de verdade)
 kit/models.json       modelo de cada tier por ferramenta
 kit/templates/        AGENTS.md, config.md e brand.md instalados nos projetos
 kit/cursor-plugin/    manifesto e hooks do plugin do Cursor
+kit/claude-plugin/    manifesto e hooks do plugin do Claude Code
 plugins/devkit/       plugin do Cursor (gerado)
-scripts/sync.mjs      gera .claude/skills, .claude/agents, .cursor/agents, .agents/agents, plugins/devkit
+plugins/devkit-claude/ plugin do Claude Code (gerado)
+scripts/sync.mjs      gera .claude/skills, .claude/agents, .cursor/agents, .agents/agents e os dois plugins
 scripts/install.mjs   instala o kit em outro projeto
 ```
 
@@ -123,6 +151,7 @@ node scripts/sync.mjs --check
 ## Pontos a conferir na sua instalação
 
 - **Modelo barato no Cursor:** o Cursor aceita `inherit` ou um ID de modelo. `kit/models.json` usa `claude-haiku-5-5`, que não foi confirmado; liste os IDs com `agent models` (CLI do Cursor) e ajuste se for diferente.
+- **Plugin do Claude Code:** passa em `claude plugin validate --strict`, mas não foi exercitado em uma sessão real. A documentação não diz se, dentro de um plugin, `agent:` e `skills:` pedem o nome com prefixo; o kit usa o prefixo (`devkit:tester`, `devkit:devkit-validador`). Se `/devkit:tester` não rodar no validador, é esse o ponto a ajustar em `scripts/sync.mjs`.
 - **Plugin do Cursor:** o layout segue a referência oficial, mas não foi testado em um Cursor real. Dois pontos que a documentação não esclarece: se subagents de plugin respeitam o campo `model`, e se `${CURSOR_PLUGIN_ROOT}` é expandido nos comandos de hook no Windows.
 - **Skills duplicadas no Cursor:** o Cursor também lê `.claude/skills/`. Se as skills aparecerem em dobro, instale com `--tools cursor,antigravity` nos projetos em que não usa o Claude Code, ou desligue a opção de configurações de terceiros no Cursor.
 - **Hooks no Antigravity:** a documentação não informa o diretório de trabalho dos hooks; a configuração assume a raiz do workspace. Confira com `/hooks` na CLI.

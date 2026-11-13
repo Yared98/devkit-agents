@@ -123,6 +123,10 @@ try {
   const input = readStdin();
   // Cursor also loads Claude Code hooks from .claude/settings.json; .cursor/hooks.json already covers it.
   if (tool === 'claude' && input.cursor_version) reply();
+  // Running from a plugin while the project also has the kit installed: the project copy handles it.
+  const self = fileURLToPath(import.meta.url);
+  const projectCopy = path.join(root, '.agents', 'hooks', 'devkit-hook.mjs');
+  if (path.resolve(self) !== path.resolve(projectCopy) && fs.existsSync(projectCopy)) reply();
   ({ 'session-start': sessionStart, guard, track, stop })[event]?.(input);
   reply();
 } catch {

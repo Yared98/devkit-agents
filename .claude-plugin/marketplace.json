@@ -1,0 +1,12 @@
+{
+  "name": "devkit-agents",
+  "description": "DevKit: skills, subagents e hooks para desenvolvimento full stack.",
+  "owner": { "name": "Yared98" },
+  "plugins": [
+    {
+      "name": "devkit",
+      "source": "./plugins/devkit-claude",
+      "description": "Skills, subagents e hooks para desenvolvimento full stack, com Context Bank e validação por camada."
+    }
+  ]
+}
